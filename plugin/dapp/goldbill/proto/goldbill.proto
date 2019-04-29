@@ -1,0 +1,369 @@
+syntax = "proto3";
+package goldbill;
+
+//enum GoldbillActionType {
+//    MsgError = 0;
+//	MsgInitPlatform = 1;//平台初始化 唯一管理员签名
+//	MsgRegisterUser = 2;//注册用户 user  用户签名 admin 平台公钥签名
+//	MsgSetFee = 3;// 佣金比列 admin公钥签名
+//	MsgSetStamps = 4;//设置印花税 admin公钥签名
+//	MsgSetBail = 5;//设置保证金比例  admin公钥签名
+//	MsgWithdraw = 6;//提款  admin公钥签名
+//	MsgDeposit = 7;//充值 用户签名
+//	MsgDepositKcoin = 8;//W币充币
+//    MsgWithdrawKcoin = 9;//W币提币
+//	MsgPayKCoin = 10;//W币支付 用户签名
+//	MsgInvoice = 11;//开票 用户签名
+//	MsgAddBill = 12;//添加仓单
+//	MsgBatchSell = 13;//批量挂牌 admin
+//	MsgBatchCancelSell = 14;//批量撤牌 admin
+//	MsgBatchBuy = 15;//批量摘牌 user
+//	MsgBatchPay = 16 ;//批量赠送
+//	MsgBatchTakeOut = 17;//批量提货
+//	MsgSliceBill = 18 ;//切分仓单
+//	MsgBatchRegUser = 19;//批量注册用户
+//	MsgCount = 99;
+//}
+
+message GoldbillAction {
+	oneof value{
+		GoldbillInitPlatform initPlatform = 1; //平台初始化
+		GoldbillRegisterUser registerUser = 2;//注册用户
+		GoldbillSetFee setFee = 3 ;//佣金比列
+		GoldbillSetStamps setStamps = 4 ;//设置印花税
+		GoldbillSetBail setBail = 5 ;//设置保证金比例
+		GoldbillWithdraw withdraw = 6 ;//提款
+		GoldbillDeposit deposit = 7;//充值
+		GoldbillWithdrawKcoin withdrawKcoin = 8 ;//提款
+		GoldbillDepositKcoin depositKcoin = 9;//充值
+		GoldbillPayKCoin payKCoin = 10;//W币支付
+		GoldbillInvoice invoice = 11;//开发票
+		GoldbillAddBill addBill = 12;//添加仓单
+		GoldbillBatchSell batchSell = 13;//
+		GoldbillBatchCancelSell batchCancelSell = 14;//
+		GoldbillBatchBuy batchBuy = 15;//
+		GoldbillBatchPay batchPay = 16;//
+		GoldbillBatchTakeOut batchTakeOut = 17;//
+		GoldbillSliceBill sliceBill = 18;//
+		GoldbillBatchRegUser batchRegUser = 19;//
+	}
+    GoldbillActionType ty = 35;
+}
+
+message GoldbillInitPlatform {
+	bytes platformKey = 1;//平台公钥
+	string info = 2;//备注
+}
+
+message GoldbillRegisterUser {
+	bytes userPubkey = 1;//用户公钥
+	string userId = 2;//用户id
+	GoldbillUserType userType = 3;//用户类型
+}
+
+message GoldbillSetFee {
+	int64 fee = 1;//佣金比列
+}
+
+message GoldbillSetStamps {
+	int64 stamps = 1;//印花税
+}
+
+message GoldbillSetBail {
+	int64 bail = 1;//保证税
+}
+
+message GoldbillWithdraw {
+	int64 amount = 1;//提款金额
+	string uid = 2;//提款用户
+	bytes pubkey = 3;//提款公钥
+}
+
+message GoldbillDeposit	{
+	int64 amount = 1;//充值金额
+}
+
+message GoldbillPayKCoin {
+	int64 amount = 1;//金额
+	int64 phone = 2;//手机号
+	string name = 3;//姓名
+	bytes topubkey = 4;//
+}
+
+message GoldbillInvoice {
+	GoldbillInvoiceType invoiceType = 1;//发票类型
+	GoldbillCommonInvoice commonInvoice = 2;//普通发票
+	GoldbillVATInvoice vatInvoice = 3;//增值税发票
+}
+
+message GoldbillAddBill {
+	 repeated GoldbillDetail billList = 1;//仓单
+}
+
+message GoldbillWithdrawKcoin {
+	string uid = 1 ;//提币账户
+	int64 amount = 2;//提笔数量
+}
+
+message GoldbillDepositKcoin {
+	int64 amount = 1;//充币数量
+}
+
+message GoldbillBatchSell {
+	repeated GoldbillDetail billList = 1;//
+}
+
+message GoldbillBatchCancelSell {
+	repeated string billList = 2;//
+}
+
+message GoldbillBatchBuy {
+	repeated string billList = 3;//
+}
+
+message GoldbillBatchPay {
+	repeated GoldbillPayTo payTo = 2;
+}
+
+message GoldbillBatchTakeOut	{
+	repeated string  billId = 1;//仓单编号
+	GoldbillTakeOutType takeOutType = 2;//提货方式 自提 和 物流
+	GoldbillPickUp pickUp = 3;//自提
+	GoldbillTakeDelivery takeDelivery = 4;//物流
+}
+
+message GoldbillSliceBill {
+    string bigId = 1;//大仓单
+    repeated GoldbillSmall smallBill = 2;//切分小仓单
+}
+
+message GoldbillBatchRegUser {
+	repeated GoldbillKeyUid userList = 1;//
+}
+
+message GoldbillResponseInitPlatform {
+	GoldbillPlatform goldbillPlatform = 1;//
+}
+
+message GoldbillResponseRegisterUser {
+	GoldbillUser goldbillUser = 1;//
+}
+
+message GoldbillResponseSetFee {
+	GoldbillPlatform goldbillPlatform = 1;//
+}
+
+message GoldbillResponseSetStamps {
+	GoldbillPlatform goldbillPlatform = 1;//
+}
+
+message GoldbillResponseSetBail {
+	GoldbillPlatform goldbillPlatform = 1;//
+}
+
+message GoldbillResponseWithdraw {
+	GoldbillPlatform goldbillPlatform = 1;//
+	GoldbillUser goldbillUser = 2;//
+}
+
+message GoldbillResponseDeposit	{
+	GoldbillPlatform goldbillPlatform = 1;//
+	GoldbillUser goldbillUser = 2;//
+}
+
+message GoldbillResponsePayKCoin {
+	GoldbillUser from = 1;//
+	GoldbillUser to = 2;//
+}
+
+message GoldbillResponseInvoice {
+	string invoiceId = 1;//
+}
+
+message GoldbillResponseAddBill {
+	repeated string billList = 1;//
+}
+
+message GoldbillResponseWithdrawKcoin {
+	GoldbillPlatform goldbillPlatform = 1;//
+	GoldbillUser goldbillUser = 2;//
+}
+
+message GoldbillResponseDepositKcoin {
+	GoldbillPlatform goldbillPlatform = 1;//
+	GoldbillUser goldbillUser = 2;//
+}
+
+message GoldbillResponseBatchSell {
+	repeated string sellList = 1;//
+}
+
+message GoldbillResponseBatchCancelSell {
+	repeated string cancelList = 1;//
+}
+
+message GoldbillResponseBatchBuy {
+	repeated string buyList = 1;//
+}
+
+message GoldbillResponseBatchPay {
+	GoldbillUser from = 1;//
+	repeated string billList = 2;//
+}
+
+message GoldbillResponseSliceBill {
+	GoldbillDetail oldBill = 1;//大仓单
+	repeated GoldbillDetail newBill = 2;//切分小仓单
+}
+
+message GoldbillResponseBatchTakeOut {
+	repeated string  billId = 1;//仓单编号
+}
+
+message GoldbillResponseBatchRegUser {
+	repeated string succ = 1;//
+	repeated string fail = 2;//
+}
+
+
+enum GoldbillUserType {
+	UT_UNKNOWN = 0;
+	UT_USER = 1;//用户
+	UT_ADMIN = 2;//管理员
+}
+
+enum GoldbillTakeOutType {
+	TOT_UNKNOWN = 0;
+	TOT_PICKUP = 1;//自提
+	TOT_TAKEDELIVERY = 2;//物流
+}
+
+message GoldbillPlatform {
+	bytes pubkey = 1; //平台公钥
+	string info = 2; //信息
+	int64 feeAmount = 3;//佣金
+	int64 fee = 4;//佣金比列
+	int64 stampsAmount = 5;//印花税
+	int64 stamps = 6;//印花税比列
+	int64 bailAmount = 7;//保证金
+	int64 bail = 8;//保证金比列
+	repeated string sellList = 9;//挂牌列表
+	int64 pledgeAmount = 10;//质押金额
+	int64 rmb = 11;//
+	int64 kcoin = 12;//
+	int64 rate = 13;//兑换比列
+}
+
+message GoldbillUser {
+	string uid = 1;//
+	int64 rmb = 2;//
+	int64 frozen = 3;//
+	int64 kcoin = 4;
+	string name = 5;//
+	int64 phone = 6;//
+	string mail = 7;//
+	repeated string wrList = 8;//拥有的仓单列表
+	bytes pubkey = 9;//
+	GoldbillUserType type = 10;//用户类型
+}
+
+message GoldbillAdmin {
+	string uid = 1;//
+	bytes pubkey = 2;//
+}
+
+message GoldbillKeyUid {
+	string uid = 1;//
+	bytes pubkey = 2;//
+}
+
+message GoldbillPickUp {
+	int64 phone = 1;//手机号
+}
+
+message GoldbillTakeDelivery {
+	string receiver = 1;//接收人
+	string receiveAddr = 2;//收货地址
+	string contract = 3;//联系方式
+	GoldbillDeliveryFeeType deliveryFeeType = 4;//付费方式
+}
+
+enum GoldbillDeliveryFeeType {
+	DFT_UNKNOWN = 0;//
+	DFT_DF = 1;//到付
+	DFT_YJ = 2;//议价
+}
+
+message GoldbillDetail {
+	string billId = 1;//仓单编号
+	string billType = 2;//品类
+	string billName = 3;//品名
+	string billBand = 4;//品牌
+	string billStand = 5;//规格
+	string billPack = 6;//包装
+	int64 billNum = 7;//数量
+	int64 billPrice = 8;//单价
+	GoldbillState billState = 9;//状态
+	int64 amount = 10;//挂牌金额
+	int64 pledgeAmount = 11;//质押金额
+	string oid = 12;//拥有着
+	bytes pubkey = 13;//
+	bool isPledge = 14;//是否质押
+	string warName = 15;//仓库名称
+	string createMan = 16;//制单人
+	string editMan  = 17;//修改人
+	string auditMan = 18;//审核人
+	string writeMan = 19;//记账人
+
+}
+
+enum GoldbillState {
+	BS_UNKNOWN = 0;
+	BS_FREE = 1;//自由
+	BS_FROZEN = 2;//冻结
+	BS_SELL = 3;//挂牌
+	BS_TAKEOUT = 4;//提货
+}
+
+enum GoldbillInvoiceType {
+	IT_UNKNOWN = 0;
+	IT_COM = 1;//普票
+	IT_VAT = 2;//增值税
+}
+
+message GoldbillCommonInvoice {
+	string company = 1;//公司
+	string taxNo = 2;//税号
+}
+
+message GoldbillVATInvoice {
+	string company = 1;//公司
+	string taxNo = 2;//税号
+	string bank = 3;//开户行
+	string bankAccount = 4;//账号
+	string address = 5;//地址
+	string contract = 6;//联系方式
+}
+
+message GoldbillBatchSellList {
+	string uid = 1;//
+	string billId = 2;//
+}
+
+message GoldbillPayTo {
+	string billId = 1;//仓单号
+	string toid = 2;//接收者
+	bytes toaddr = 3;//
+}
+
+message GoldbillSmall {
+    string billId = 1;//
+    int64 billNum =2 ;//
+}
+
+//localdb
+
+message GoldbillUserState {
+	int64 usernum = 1;//
+	int64 adminnum = 2;//
+}

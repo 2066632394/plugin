@@ -1,0 +1,263 @@
+syntax = "proto3";
+
+import "transaction.proto";
+import "account.proto";
+
+package types;
+
+// action
+message TokennoteAction {
+    oneof value {
+        TokennoteCreate         tokennoteCreate         = 1;//创建白条token owner = issuer
+        TokennoteLoan           tokennoteLoan           = 2;//借款人借款
+        TokennoteLoanedAgree    tokennoteLoanedAgree    = 3;//出借款人确认放款
+        TokennoteLoanedReject   tokennoteLoanedReject       = 4;//出借人拒绝
+        TokennoteCashed         tokennoteCashed         = 5;//还款 兑付
+        AssetsTransfer          transfer                = 6;//转账给用户 转让支付
+        AssetsWithdraw          withdraw                = 7;//合约取款
+        AssetsTransferToExec    transferToExec          = 8;//转账至合约
+        AssetsGenesis           genesis                 = 9;
+        TokennoteMint           tokennoteMint               = 10;//增发
+        TokennoteBurn           tokennoteBurn               = 11;//销毁
+    }
+    int32 Ty = 99;
+}
+
+//创建token，支持最大精确度是8位小数,即存入数据库的实际总额需要放大1e8倍
+message TokennoteCreate {
+    string issuer       = 1;//发行方地址
+    string issuerName   = 2;//发行方填名字
+    string issuerPhone  = 3;//手机号
+    string issuerId     = 4;//身份证
+    string acceptor     = 5;//承兑方 区块链地址 个人发 默认是签名用户
+    int64  balance      = 6;//金额 发币总额
+    string currency     = 7;//币种 字母大写
+    int64  acceptanceDate = 8;//承兑日 精确到秒
+    int64  rate           = 9;// * 10000
+    string introduction = 10;
+    int64  repayamount  = 11;//
+}
+
+message TokennoteLoanedReject {
+    string symbol = 1;
+    string owner  = 2;
+    int64  loanTime = 3;
+}
+
+message TokennoteLoan {
+    string symbol = 1;
+    string to     = 2;//出借人
+    int64  amount = 3;//
+}
+
+message TokennoteLoanedAgree {
+    string symbol = 1;
+    string owner = 2;
+    int64 loantime = 3;
+}
+
+message TokennoteCashed {
+    string symbol = 1;
+    int64 cash    = 2;//兑付金额
+
+}
+
+message TokennoteMint {
+    string symbol = 1;
+    int64  amount = 2;
+}
+
+message TokennoteBurn {
+    string symbol = 1;
+    int64  amount = 2;
+}
+
+// state db
+message Tokennote {
+    string issuer       = 1;//发行方
+    string acceptor     = 2;//承兑方
+    int64  total      = 3;//金额 发币总额
+    int64  balance      = 4;//剩余借款额度
+    int64  repayamount = 5;//还款金额
+    string currency     = 6;//币种 字母
+    int64  acceptanceDate = 7;//承兑日
+    int64  rate           = 8;//正常利率
+    string issuerName         = 9;//
+    string issuerPhone   = 10;//
+    string issuerId      = 11;//
+    string introduction = 12;
+    int32  status       = 13;//状态 0 默认  1 发币 成功 2 已还款 注销
+    repeated TokennoteHold holds = 14;//出借人
+    int64 createTime = 15;
+    int64 overdueRate = 16;//逾期利率
+}
+
+message TokennoteHold {
+    string addr = 1;
+    string currency = 2;//
+    int64 amount = 3;
+    int64 repayamount = 4;
+    int64 loanTime = 5;//
+    int32 status = 6;// 待借 已借 已还款
+    string creator = 7;
+}
+
+// log
+message ReceiptTokennote {
+    string symbol = 1;
+    string owner  = 2;
+    int32  status = 3;
+}
+
+message ReceiptTokennoteCashed {
+    repeated TokennoteCashDetail cashlist = 1;//
+}
+
+message TokennoteCashDetail {
+    string currency = 1;//
+    string addr = 2;//
+    int64 amount = 3;//
+    int64 height = 4;
+    int64 time = 5;
+    int64 index = 6;
+}
+
+// local
+message LocalTokennote {
+    string  issuer          = 1;//发行方
+    string  acceptor        = 2;//承兑方
+    int64   total           = 3;
+    int64   balance         = 4;//金额 发币总额
+    string  currency        = 5;//币种 字母大写
+    int64   acceptanceDate  = 6;//承兑日
+    int64   rate            = 7;//
+    string  issuerName      = 8;//
+    string  issuerPhone     = 9;
+    string  issuerId        = 10;//
+    string  introduction    = 11;
+    int32   status          = 12;
+    int64   createdHeight   = 13;
+    int64   createdTime     = 14;
+    int64   overdueRate     = 15;
+
+}
+
+// query
+message ReqTokennotes {
+    bool     queryAll          = 1;
+    int32    status            = 2;
+    repeated string tokennotes     = 3;
+    bool            symbolOnly = 4;
+}
+
+message ReplyTokennotes {
+    repeated LocalTokennote tokens = 1;
+}
+
+message TokennoteRecv {
+    string tokennote = 1;
+    int64  recv  = 2;
+}
+message ReplyAddrRecvForTokennotes {
+    repeated TokennoteRecv tokennoteRecvs = 1;
+}
+
+message ReqTokennoteBalance {
+    repeated string addresses   = 1;
+    string          tokennoteSymbol = 2;
+    string          execer      = 3;
+}
+
+message ReqAccountTokennoteAssets {
+    string address = 1;
+    string execer  = 2;
+}
+
+message TokennoteAsset {
+    string  symbol  = 1;//白条标识
+    string  creator = 2;//借款人
+    Account account = 3;//白条拥有者地址，出借总金额，冻结金额，白条token标识
+    int64  singleAmount = 4;
+    int64  repay    = 5;//还款金额
+    int64  acceptanceDate = 6;
+    string issuerName = 7;//
+    string issuerPhone = 8;//
+    int64  loanTime = 9;//
+    int32 status      = 10;//状态
+}
+
+message ReplyAccountTokennoteAssets {
+    repeated TokennoteAsset tokennoteAssets = 1;
+}
+
+message ReplyAccountTokennoteList {
+    repeated TokennoteAddrTime list = 1;
+}
+
+//用户还款记录
+message ReplyTxTokennoteCashedList {
+    repeated TokennoteCashedTx list = 1;
+}
+
+//用户还款详情记录
+message ReplyTxTokennoteCashedDetail {
+    Tokennote detail = 1;
+}
+
+message ReplyTokennoteCashed {
+    repeated TokennoteHold list = 1;
+}
+
+message TokennoteCashedTx {
+    string currency = 1;//
+    string addr = 2;//
+    int64 height = 3;//
+    int64 blocktime = 4;//
+}
+
+
+message TokennoteAddrTime {
+    string currency = 1;//
+    int64 time = 2;//借款生效时间
+}
+
+message ReqAddrTokennotes {
+    string   addr             = 1;
+    int32    status           = 2;
+    repeated string token     = 3;
+    int32           direction = 4;
+    int32           count     = 5;
+    string          fromKey   = 6;
+}
+
+message ReqTokennoteTx {
+    string symbol = 1;
+    //表示取所有/from/to/其他的hash列表
+    int32  flag      = 2;
+    int32  count     = 3;
+    int32  direction = 4;
+    int64  height    = 5;
+    int64  index     = 6;
+    string addr      = 7;
+}
+
+message TokennoteMarket {
+    repeated Tokennote marketList = 1;
+}
+
+message TokennoteAccountCredit {
+    string  addr = 1;//
+    int64   createdNotes = 2;//已创建的白条
+    int64   recvAmount = 3;//借到的金额
+    int64   sendAmount = 4;//归还金额
+    int64   usingAmount = 5;//使用中的金额
+    int64   repayAmount = 6;//已还款的金额（不包括利息）
+
+}
+
+
+service tokennote {
+    // token 对外提供服务的接口
+    //区块链接口
+    rpc GetTokenBalance(ReqTokennoteBalance) returns (Accounts) {}
+}

@@ -1,0 +1,825 @@
+syntax = "proto3";
+package types;
+
+//预付款
+message AdanceInfo{
+    string adanceId             = 1;//预付款ID
+    Enterprise coreCompany      = 2;//核心企业
+    Enterprise downCompany      = 3;//下游企业
+    int64  orderAmount          = 4;//订单总额
+    int64  signDate             = 5;//签订日期
+    int64  endDate              = 6;//承兑日期
+    int64  goodsNums            = 7;//交货数量
+    int64  goodsDate            = 8;//交货日期
+    string goodsName            = 9;//商品名称
+    ZsgjState state             = 10;
+    OperationType opty          = 11;//
+    int64  rate                 = 12;//利率
+    Enterprise ownerCompany     = 13;//
+}
+
+//单据-
+message ZsgjReceipt{
+    int64       registerDate    = 1;//登记时间
+    Enterprise  coreCompany     = 2;//核心企业
+    Enterprise  receiveCompany  = 3;//上游企业
+    int64       sumAmount       = 4;//应收账总额
+    int64       startDate       = 5;//签订日期
+    int64       endDate         = 6;//承兑日期
+    Enterprise  issuedAgency    = 7;//发行机构
+    ZsgjState   state           = 8;//状态
+    string      info            = 9;//备注
+    OperationType opty          = 10;//
+    Enterprise  opCompany       = 11;//操作企业
+    string      receiptId       = 12;//单据编号 //唯一ID
+    Enterprise  investAgency    = 13;//基金方 渠道选择
+    int64       rate            = 14;//逾期利率
+    string      receiptViceId   = 15;//单据父ID
+    int64       financeAmount   = 16;//已融资金额
+}
+//产品详情-
+message ZsgjProduct{
+    string productId            = 1;//产品编号 //唯一ID
+    string productName          = 2;//产品名称
+    int32  annualizedRate       = 4;//预期年化收益率
+    Enterprise issuedAgency     = 5;//发行机构
+    string frequency            = 6;//付息频率
+    string payInterestMethod    = 7;//付息方式
+    string calInterestMethod    = 8;//计息方式
+    string coinType             = 9;//投资币种
+    Enterprise guaranteeAgency  = 10;//担保机构
+    Enterprise hostingAgency    = 11;//托管机构
+    int64  issueScale           = 12;//发行规模
+    string saleTarget           = 13;//销售对象
+    string riskLevel            = 14;//风险级别
+    int64  raiseStartDate       = 15;//募集开始时间
+    int64  raiseEndDate         = 16;//募集结束时间
+    int64  calInterestStart     = 17;//计息日开始
+    int64  calInterestEnd       = 18;//计息日到期
+    int64  startAmount          = 20;//认购起点金额
+    int64  increamentingAmount  = 21;//认购递增金额
+    int64  subscriptionPerson   = 22;//认购者上限
+    bool   isTranferable        = 23;//是否可转让
+    string info                 = 24;//备注
+    int64  transferStart        = 25;//转让开始时间
+    int64  transferEnd          = 26;//转让结束时间
+    int64  minHoldingDuration           = 27;//最低持有时间
+    bool   istransferRateFloat          = 28;//转让利率是否可浮动
+    int64  minTransferAmount            = 29;//最低转让本金金额
+    string rateFloatInterregional       = 30;//转让利率浮动区间
+    int64  transferIncreamentingAmount  = 31;//转让递增本金金额
+    string transferFeeTarget            = 32;//转让费收取对象
+    ZsgjState state                     = 33;
+    OperationType opty                  = 34;
+    Enterprise opCompany                = 35;//操作企业
+    string receiptId                    = 36;//单据ID
+}
+//账户
+message ZsgjAccount{
+    string           companyName      = 1;//企业名
+    RmbAssets        rmb              = 2;//账户人民币余额
+}
+message ZsgjRoleAccount{
+    Enterprise       enterprise       = 1;//企业名称-角色
+    ReceiptAssets    receiptAssets    = 2;//单据资产
+    ProductAssets    productAssets    = 3;//产品资产
+    BlankNoteAssets  blankNoteAssets  = 4;//白条资产
+    AdanceAssets     adanceAssets     = 5;//预付款资产
+}
+message AllAccount{
+    ZsgjAccount account=1;
+    repeated ZsgjRoleAccount roleAccount=2;
+}
+message ZsgjAction{
+    oneof value{
+        ZsgjSaveReceipt          zsgjSaveReceipt          = 1;//保存单据
+        ZsgjSaveProduct          zsgjSaveProduct          = 2;//保存产品
+        AssetRegisterAction      assetRegister            = 3;//资产登记
+        ZsgjApplyRecharge        zsgjApplyRecharge        = 4;//充值
+        ZsgjApplyWithdraw        zsgjApplyWithdraw        = 5;//提款
+        ZsgjCash                 zsgjCash                 = 6;//兑付
+        ZsgjClear                zsgjClear                = 7;//清算
+        ZsgjDelist               zsgjDelist               = 8;//摘牌
+        ZsgjCompanyCertification zsgjCompanyCertification = 9;//企业认证
+        ZsgjPersonCertification  zsgjPersonCertification  = 10;//个人认证
+        DlReceiptPay             dlReceiptPay             = 11;//单据支付
+        DlReceiptDelist          dlReceiptDelist          = 12;//单据摘牌
+        DlBlankNote              dlBlankNote              = 13;//白条
+        DlReceiptList            dlReceiptList            = 14;//单据挂牌
+        DlBlankNotePay           dlBlankNotePay           = 15;//白条支付
+        DlReceiptAndNoteCash     dlReceiptAndNoteCash     = 16;//白条、单据持有兑付
+        DlInvestCash             dlInvestCash             = 17;//渠道企业兑付
+        DlCredit                 dlCredit                 = 18;//信用额度
+        AdAssetRegister          adAssetRegister          = 19;//预付款资产登记
+        AdApplyBlankNote         adApplyBlankNote         = 20;//预付款申请白条
+        AdAndNoteCash            adAndNoteCash            = 21;//预付款申请兑付,白条兑付
+        GylFinanceInfo           gylFinanceInfo           = 22;//供应链企业融资信息
+        GylDirectFinance         gylDirectFinance         = 23;//供应链定向融资
+    }
+    int32 Ty = 50;
+}
+//兑付-
+message ZsgjCash {
+    string      id                  = 1;//序号 产品ID
+    Enterprise  investAgency        = 2;//投资机构
+    int64       rate                = 3;//兑付利率
+    int64       waitAmount          = 4;//待付本金
+    int64       waitInterest        = 5;//待付利息
+    int64       delayWaitInterest   = 6;//延期待付利息
+    int64       waitSumAmount       = 7;//待付总额
+    OperationType opty              = 8;
+    Enterprise  opCompany           = 9;
+}
+//清算-
+message ZsgjClear{
+    string      productId       = 1;//产品编号 //唯一ID
+    string      name            = 2;//产品名称
+    ZsgjState   state           = 4;//状态 认购中
+    int64       annualizedRate  = 5;//年化利率
+    Enterprise  issuedName      = 7;//发行商
+    int64       createTime      = 8;//创建时间
+    int64       amount          = 9;//发行总额
+    int64       raiseStartDate  = 10;//募集开始时间
+    int64       raiseEndDate    = 11;//募集结束时间
+    int64       duration        = 12;//期限
+}
+//摘牌-
+message ZsgjDelist{
+    int64  calInterestStart         = 1;//计息日开始
+    int64  calInterestEnd           = 2;//计息日到期
+    int64  startAmount              = 3;//认购起点金额
+    int64  increamentingAmount      = 4;//认购递增金额
+    string saleTarget               = 5;//销售对象
+    string riskLevel                = 6;//风险级别
+    int32  annualizedRate           = 7;//预期年化收益率
+    int64  duration                 = 8;//期限
+    int64  purchaseable             = 9;//可购金额
+    int64  purchase                 = 10;//购买金额
+    OperationType opty              = 11;//
+    Enterprise opCompany            = 12;
+    string productId                = 13;
+}
+//提款
+message ZsgjApplyWithdraw{
+    string id                 = 1;//流水编号
+    string companyName        = 2;//企业名称
+    int64  applyDate          = 3;//申请时间
+    int64  amount             = 4;//出金金额
+    ZsgjState state           = 5;
+    string name               = 6;//名称
+    string account            = 7;//卡号
+}
+//充值
+message ZsgjApplyRecharge{
+    string id           = 1;//流水编号
+    string companyName  = 2;//划拨企业
+    int64  applyDate    = 3;//申请时间
+    int64  amount       = 4;//入金金额
+    string account      = 5;//银行卡号
+    string name         = 6;//名称
+    int64  completeDate = 7;//完成时间
+}
+//产品申请审核
+message ZsgjProductExamine{
+    ZsgjProduct product   = 1;
+    int64       applyDate = 2;//申请时间
+}
+//个人认证
+message ZsgjPersonCertification{
+    string name             = 1;//认证姓名
+    string idCard           = 2;//身份证号
+    string phoneNumber      = 3;//注册手机号
+    int64  certificateDate  = 4;//认证日期
+    ZsgjState state         = 5;
+    string info             = 6;//备注信息
+}
+//企业认证
+message ZsgjCompanyCertification{
+    string name             = 1;//认证姓名
+    string idCard           = 2;//身份证号
+    string phoneNumber      = 3;//注册手机号
+    int64  certificateDate  = 4;//认证日期
+    string info             = 5;//备注信息
+    string companyName      = 6;//企业名称
+    string companyAddress   = 7;//办公地址
+    string licenseNumber    = 8;//营业执照号码
+    string legalPersonName  = 9;//法人姓名
+    ZsgjState state         = 10;
+    bytes pubKey            = 11;//
+}
+//保存单据
+message ZsgjSaveReceipt{
+    ZsgjReceipt zsgjReceipt = 1;
+}
+//保存产品
+message ZsgjSaveProduct{
+    ZsgjProduct zsgjProduct = 1;
+}
+//资产登记-
+message AssetRegisterAction{
+    int64  registerDate         = 1;//登记时间
+    Enterprise payCompany       = 2;//付款企业 核心企业
+    Enterprise receiveCompany   = 3;//收款企业 上游企业
+    int64  sumAmount            = 4;//应收账总额
+    int64  startDate            = 5;//出账日期
+    int64  endDate              = 6;//承兑日期
+    string contractName         = 7;//合同名称 可以重复
+    string contractNo           = 8;//合同编号 可以重复
+    ZsgjState state             = 9;
+    OperationType opty          = 10;//
+    string receiptId            = 11;//单据ID
+    Enterprise investAgency     = 12;//基金方 渠道选择
+    int64  rate                 = 13;//逾期利率
+}
+//预付款资产登记-
+message AdAssetRegister{
+    int64  registerDate         = 1;//登记时间
+    Enterprise coreCompany      = 2;//核心企业
+    Enterprise downCompany      = 3;//下游企业
+    int64  orderAmount          = 4;//订单总额
+    int64  signDate             = 5;//签订日期
+    int64  endDate              = 6;//承兑日期
+    int64  goodsNums            = 7;//交货数量
+    int64  goodsDate            = 8;//交货日期
+    string goodsName            = 9;//商品名称
+    ZsgjState state             = 10;
+    OperationType opty          = 11;//
+    string adanceId             = 12;//预付款ID
+    int64  rate                 = 13;//利率
+    Enterprise opCompany            = 14;//操作企业
+}
+
+//预付款申请白条
+message AdApplyBlankNote{
+    Enterprise coreCompany      = 1;//核心企业
+    Enterprise financeCompany   = 2;//资金方企业
+    bool isOnline               = 3;//付款方式
+    bool isBank                 = 4;//资金方类型
+    int64 amount                = 5;//白条金额
+    int64 rate                  = 6;//利率
+    int64 endDate               = 7;//白条承兑日期
+    int64 cashAmount            = 8;//兑付金额
+    string  blankId             = 9;//白条编号
+    string  adanceId            = 10;//预付款编号
+    ZsgjState state             = 11;
+    OperationType opty          = 12;//
+    Enterprise opCompany        = 13;//操作企业
+}
+
+//预付款兑付和白条兑付
+message AdAndNoteCash{
+    Enterprise ownerEnterprise  = 1;//持有方
+    Enterprise cashEnterprise   = 2;//兑付方
+    string adanceId             = 3;//预付款编号
+    string blankNoteId          = 4;//预付款白条编号
+    bool  isOverDue             = 5;//是否逾期
+    int64 cashAmount            = 6;//
+    ZsgjState state             = 9;
+    OperationType opty          = 10;//
+    Enterprise opCompany            = 11;//操作企业
+}
+
+//单据支付
+message DlReceiptPay{
+    Enterprise receiveCompany   = 1;//收款企业
+    int64  amount               = 2;//订单金额
+    int64  rate                 = 3;//年化利率
+    int64  payAmount            = 4;//单据支付
+    string info                 = 5;//附言
+    Enterprise opCompany        = 6;//操作企业
+    ZsgjState state             = 7;
+    OperationType opty          = 8;//
+    string receiptId            = 9;//
+    string receiptParentsId     = 11;//
+}
+//单据摘牌
+message DlReceiptDelist{
+    int64 transferAmount        = 1;//转让份额
+    int64 delistAmount          = 2;//摘取份额
+    int64 rate                  = 3;//年化利率
+    int64 discount              = 4;//贴现费
+    int64 payAmount             = 5;//支付金额
+    Enterprise opCompany        = 6;//操作企业
+    Enterprise upstreamFirm     = 7;//上游企业
+    ZsgjState state             = 8;
+    OperationType opty          = 9;//
+    string receiptId            = 10;//
+    string receiptParentsId     = 11;//
+}
+//白条
+message DlBlankNote{
+    Enterprise  coreCompany     = 1;//核心企业
+    Enterprise  upstreamFirm    = 2;//上游企业
+    int64   amount              = 3;//单据总额
+    Enterprise cashAgency       = 4;//承兑机构
+    int64   completeDate        = 5;//票据到期日
+    int64   cashDate            = 6;//白条承兑日期
+    int64   applyBlankNote      = 7;//申请白条
+    int64   blankNoteAmount     = 8;//白条价值
+    int64   overdueRate         = 9;//逾期利率
+    int64   leftAmount          = 10;//剩余资金
+    Enterprise  opCompany       = 11;//操作企业
+    ZsgjState   state           = 12;//状态
+    OperationType opty          = 13;//
+    string  blankNoteId         = 14;//白条id
+    string  receiptId           = 15;//单据id
+    string  receiptParentsId    = 16;//单据父id
+    string  blankNoteParentsId  = 17;//白条父id
+
+}
+//单据挂牌
+message DlReceiptList{
+    int64   receiptAmount       = 1;//单据份额
+    int64   transferAmount      = 2;//转让份额
+    int64   rate                = 3;//贴现利率
+    int64   discount            = 4;//当前贴现
+    int64   finance             = 5;//融资金额
+    string  listType            = 6;//挂牌类型
+    Enterprise  opCompany       = 7;//操作企业
+    ZsgjState state             = 8;
+    OperationType opty          = 9;//
+    string receiptId            = 10;//
+    string receiptParentsId     = 11;//
+    int64 listingAmount         = 12;//挂牌中的份额
+}
+//白条支付
+message DlBlankNotePay{
+    Enterprise receiveCompany   = 1;//收款企业
+    int64  amount               = 2;//订单金额
+    int64  rate                 = 3;//年化利率
+    int64  payAmount            = 4;//白条支付
+    string info                 = 5;//附言
+    Enterprise opCompany        = 6;//操作企业
+    ZsgjState state             = 7;
+    OperationType opty          = 8;//
+    string  blankNoteId         = 9;//白条id
+    string  blankNoteParentsId  = 10;//白条父id
+}
+//渠道企业兑付(没用)
+message DlInvestCash{
+    string enterprise   = 1;//渠道企业
+    int64  amount       = 2;//单据份额
+    string receiptType  = 3;//单据类型
+    string overdueStatus= 4;//逾期状况
+    string cashStatus   = 5;//兑付类型
+    int64  cashAmount   = 6;//兑付金额
+    string opCompany    = 7;//操作企业
+    ZsgjState state     = 8;
+    OperationType opty  = 9;//
+}
+//白条、单据持有兑付
+message DlReceiptAndNoteCash{
+    Enterprise ownerEnterprise      = 1;//持有企业
+    int64  amount                   = 2;//白条金额
+    string cashType                 = 3;//兑付种类 单据、白条
+    int64 overdueStatus             = 4;//逾期状况
+    string cashStatus               = 5;//兑付类型 提前、逾期...
+    int64  cashAmount               = 6;//兑付金额
+    string cashTarget               = 7;//兑付对象 持有企业、渠道企业
+    Enterprise opCompany            = 8;//操作企业
+    int64  overdueRate              = 9;
+    ZsgjState state                 = 10;
+    OperationType opty              = 11;//
+    string  blankNoteId             = 12;//白条id
+    string  receiptId               = 13;//单据id
+}
+message DlCredit{
+    Enterprise  coreCompany = 1;//核心企业
+    int64   creditAmount    = 2;//信用额度
+    int64   otherAmount     = 3;//其他渠道额度
+    int64   using           = 4;//已使用
+    int64   remaining       = 5;//剩余额度
+    int64   oldAmount       = 6;//原额度
+    ZsgjState state         = 7;//
+    OperationType opty      = 8;
+    Enterprise opCompany    = 9;
+}
+
+//申请融资
+message GylFinanceInfo {
+    Enterprise opCompany = 1;//申请企业
+    repeated string partnerPic = 2;//伴侣身份证信息
+    repeated string householdPic = 3;//户口信息
+    repeated string taxPic = 4;//国地税信息
+    repeated string marriagePic = 5;//结婚证信息
+    repeated string contractPic = 6;//房产按揭合同信息
+    repeated string articlePic = 7;//公司章程信息
+    ZsgjState state         = 8;//
+    OperationType opty      = 9;
+}
+
+//定向融资
+message GylDirectFinance{
+    int64   receiptAmount       = 1;//单据份额
+    int64   transferAmount      = 2;//转让份额
+    int64   rate                = 3;//贴现利率
+    int64   discount            = 4;//当前贴现
+    int64   finance             = 5;//融资金额
+    Enterprise financeCompany   = 6;//资金方
+    Enterprise upstreamCompany  = 7;//单据方
+    Enterprise  opCompany       = 8;//操作企业
+    ZsgjState state             = 9;
+    OperationType opty          = 10;//
+    string receiptId            = 11;//
+    string receiptParentsId     = 12;//
+}
+
+message Enterprise{
+    string name     =1;//企业名称
+    string roleId   =2;//操作涉及企业角色
+}
+//产品摘牌信息
+message DelistInfo{
+    int64   amount  = 1;
+    string  name    = 2;
+}
+message Delist{
+    repeated DelistInfo info=1;
+}
+message RmbAssets{
+    int64 rmb       = 1;
+    int64 cashed    = 2;
+    int64 waitCash  = 3;
+    int64 invest    = 4;
+    int64 income    = 5;
+}
+message ReceiptAssets{
+    int64 receipt   = 1;
+    int64 available = 2;
+    int64 financing = 3;
+    int64 payments  = 4;
+}
+message ProductAssets{
+    int64 product   = 1;
+    int64 available = 2;
+    int64 financing = 3;
+}
+message BlankNoteAssets{
+    int64 blankNote = 1;
+    int64 available = 2;
+    int64 payments  = 3;
+}
+message AdanceAssets{
+    int64 receipt   = 1;
+    int64 available = 2;
+    int64 financing = 3;
+    int64 payments  = 4;
+}
+message ZsgjReceiptInfo{
+    string          receiptId       = 1;
+    Enterprise      coreCompany     = 2;//核心企业
+    Enterprise      receiveCompany  = 3;//上游企业
+    int64           sumAmount       = 4;//应收账总额
+    Enterprise      issuedAgency    = 5;//发行机构
+    ZsgjState       state           = 6;//状态
+    string          receiptViceId   = 7;//单据父ID
+    int64           financeAmount   = 8;//已融资金额
+    OperationType   opty            = 9;//
+    Enterprise      investAgency    = 10;//基金方 渠道选择
+    Enterprise          owner       = 11;//持有人
+    int64           transferAmount  = 12;
+    int64           payed           = 13;//已支付金额
+}
+message ZsgjProductInfo{
+    string productId            = 1;//产品编号 //唯一ID
+    string productName          = 2;//产品名称
+    int32  annualizedRate       = 4;//预期年化收益率
+    Enterprise issuedAgency     = 5;//发行机构
+    string frequency            = 6;//付息频率
+    string payInterestMethod    = 7;//付息方式
+    string calInterestMethod    = 8;//计息方式
+    string coinType             = 9;//投资币种
+    Enterprise guaranteeAgency  = 10;//担保机构
+    Enterprise hostingAgency    = 11;//托管机构
+    int64  issueScale           = 12;//发行规模
+    string saleTarget           = 13;//销售对象
+    string riskLevel            = 14;//风险级别
+    int64  raiseStartDate       = 15;//募集开始时间
+    int64  raiseEndDate         = 16;//募集结束时间
+    int64  calInterestStart     = 17;//计息日开始
+    int64  calInterestEnd       = 18;//计息日到期
+    int64  startAmount          = 20;//认购起点金额
+    int64  increamentingAmount  = 21;//认购递增金额
+    int64  subscriptionPerson   = 22;//认购者上限
+    bool   isTranferable        = 23;//是否可转让
+    string info                 = 24;//备注
+    int64  transferStart        = 25;//转让开始时间
+    int64  transferEnd          = 26;//转让结束时间
+    int64  minHoldingDuration           = 27;//最低持有时间
+    bool   istransferRateFloat          = 28;//转让利率是否可浮动
+    int64  minTransferAmount            = 29;//最低转让本金金额
+    string rateFloatInterregional       = 30;//转让利率浮动区间
+    int64  transferIncreamentingAmount  = 31;//转让递增本金金额
+    string transferFeeTarget            = 32;//转让费收取对象
+    ZsgjState state                     = 33;
+    OperationType opty                  = 34;
+    Enterprise opCompany                = 35;//操作企业
+    string receiptId                    = 36;//单据ID
+    Enterprise owner                    = 37;
+    int64  delisted                     = 38;//已摘牌额度
+    int64  cashed                       = 39;//已兑付额度
+}
+message zsgjBlankNoteInfo{
+    Enterprise  coreCompany     = 1;//核心企业
+    Enterprise  upstreamFirm    = 2;//上游企业
+    int64   amount              = 3;//单据总额
+    Enterprise cashAgency       = 4;//承兑机构
+    int64   completeDate        = 5;//票据到期日
+    int64   cashDate            = 6;//白条承兑日期
+    int64   applyBlankNote      = 7;//申请白条
+    int64   blankNoteAmount     = 8;//白条价值
+    int64   overdueRate         = 9;//逾期利率
+    int64   leftAmount          = 10;//剩余资金
+    Enterprise  opCompany       = 11;//操作企业
+    ZsgjState   state           = 12;//状态
+    OperationType opty          = 13;//
+    string  blankNoteId         = 14;//白条id
+    string  receiptId           = 15;//单据id
+    Enterprise  owner           = 16;//持有人
+    string  blankNoteParentsId  = 17;//白条父id
+    int64   payed               = 18;//已支付
+}
+
+message blankNoteInfo{
+    int64   amount              = 1;//白条总额
+    Enterprise cashAgency       = 2;//承兑机构
+    int64   cashDate            = 3;//白条承兑日期
+    int64   rate                = 4;//利率
+    int64   overdueRate         = 5;//逾期利率
+    ZsgjState   state           = 6;//状态
+    OperationType opty          = 7;//
+    string  blankNoteId         = 8;//白条id
+    string  receiptId           = 9;//单据id
+    Enterprise  owner           = 10;//持有人
+    int64   payed               = 11;//已支付
+}
+enum ZsgjState {
+    UNKNOW              = 0;
+    //保存单据状态
+    WAIT_UPSTREAM_SIGN  = 1;//("待上游企业签收",1),
+    UPSTREAM_REFUSE_SIGN= 2;//("上游企业签收拒绝",2),
+    BILL_HOLDING        = 3;//("单据被上游企业持有中",3),
+    WAIT_CORE_CHECKED   = 4;//("待核心企业确认",4),
+    CORE_REFUSE_CHECKED = 5;//("核心企业拒绝确认",5),
+    WAIT_PUBLISH_SIGN   = 6;//("待发行机构签收",6),
+    PUBLISH_REFUSE_SIGN = 7;//("发行机构拒绝签收",7),
+    BILL_HOLDING_ISSUE  = 8;//("单据被发行机构持有中",8),
+    UPSTREAM_BE_PRODUCT = 9;//("上游企业将单据发行产品",9),
+    ISSUE_BE_PRODUCT    = 10;//("发行机构将单据发行产品",10),
+    BILL_CANCEL         = 11;//("单据撤销",11)
+    //保存产品状态
+    PRODUCT_CANCE       = 12;//("撤销的产品",99),
+    WAIT_GUARANTEE      = 13;//("待担保",100),
+    WAIT_TRUSTEESHIP    = 14;//("待托管",101),
+    REFUSE_GUARANTEE    = 15;//("担保被拒绝",102),
+    REFUSE_TRUSTEESHIP  = 16;//("托管被拒绝",103),
+    WAIT_EXAMINE        = 17;//("待审核",104),
+    REFUSE_EXAMINE      = 18;//("审核被拒绝",105),
+    //持有的产品
+    //待挂牌
+    ON_HOLD             = 19;//("产品持有中",106),
+    //待认购
+    ON_LISTING          = 20;//("待认购",107),
+    //认购中
+    ON_LISTING_DELISTING= 21;//("挂牌中有被摘牌",108),
+    WAIT_FOR_LIQUIDATION= 22;//("等待清算",109),
+    SUCCESS_RELEASE     = 23;//("发行成功待兑付",110),
+    FAIL_RELEASE        = 24;//("发行失败",111),
+    //已经完成的产品
+    SUCCESS_PAYMENT     = 25;//("已完成兑付",112);
+    //资产登记状态
+    //充值状态
+    IN_AUDIT_SUCCESS    = 26;//入金通过
+    //提款状态
+    OUT_AUDIT2_BANK_SUCCESS= 27;//(43, "出账成功"),
+    OUT_AUDIT2_BANK_FAIL= 28;//(44, "出账失败");
+    OUT_AUDIT1_SUCCESS  = 29;//(31, "初审通过"),//同意按钮
+    OUT_AUDIT1_FAIL     = 30;//(32, "初审拒绝"),//拒绝按钮
+    OUT_WAIT_AUDIT1     = 31;//（30,"等待初审")
+    //清算
+    CLEAR_SUCCESS       = 34;//清算成功  //发行成功
+    CLEAR_FALSE         = 35;//清算失败   //发行失败
+    //企业认证和个人认证
+    PASS_EXAMINE        = 38;//("审核通过",106),
+
+    BILL_OVERDUE        = 39;//("单据逾期",12),
+    BILL_EXPIRE         = 40;//("单据到期",13),
+    PLEDGE_BILL_LISTING             = 41;//("票据质押待认购",15),
+    PLEDGE_BILL_LISTING_FINISH      = 42;//("票据质押挂牌完成",32),
+    PLEDGE_BILL_HOLDING             = 43;//("票据质押被投资机构持有,待申请白条",17),  //投资机构(摘牌的单据)待兑付
+    PLEDGE_BILL_APPLYING            = 44;//("票据质押被投资机构持有,申请白条中",18), //投资机构
+    PLEDGE_BILL_IOUS                = 45;//("票据质押被投资机构持有,申请白条完成",19),   //投资机构
+    CONTRACT_BILL_WAIT_SUBSCRIBE    = 46;//("订单合同挂牌待认购",20),      //核心企业(发行的单据)欠款中     //上游企业(持有的单据)挂牌中
+    CONTRACT_BILL_LIST_FINISH       = 47;//("订单合同挂牌完成",31),           //订单合同挂牌时原始单据已经全都挂完
+    CONTRACT_BILL_IN_SUBSCRIBE      = 48;//("订单合同挂牌认购中",21),        //核心企业(发行的单据)欠款中     //上游企业(持有的单据)挂牌中  //上游企业(已完成的单据)摘牌成功
+    CONTRACT_BILL_FINISH_SUBSCRIBE  = 49;//("订单合同挂牌认购完成",22),  //核心企业(发行的单据)欠款中     //上游企业(已完成的单据)摘牌完成
+    CONTRACT_BILL_HOLDING           = 50;//("订单合同被投资机构持有",23),//(子单的状态) /投资机构(摘牌的单据)待兑付
+    BILL_PAY_FROZEN                 = 51;//("单据支付冻结中",24),              //(子单的状态)【新生成的单据】
+    BILL_PAY_FINISH                 = 52;//("单据支付已完成",25),              //【可用的钱全都支付完了,母单才变成完成，不然都是持有】
+    BILL_PAY_CANCEL                 = 53;//("单据支付撤销中",26),              //【可用的钱全都支付完了,母单才变成完成，不然都是持有】
+    PLEDGE_BILL_APPLYING_REFUSE     = 54;//("单据申请白条被拒绝",27), //核心企业(发行的单据)欠款中     //上游企业(已完成的单据)申请白条拒绝
+    HAD_CASH_FINISH                 = 55;//("已兑付",29),  //核心企业(已完成的单据)已兑付
+    BILL_INVALID                    = 56;//("单据作废",30),
+    BILL_IN_TRANSFER                = 57;//("单据转让中",33),
+    BILL_TRANSFER_FINISH            = 58;//("单据转让完成",34),
+    WAITING_HONOUR                  = 59;//("等待兑付", 35),
+    BILL_APPLYING_IOU               = 60;//("单据申请白条中",300),
+    APPLY_OK                        = 61;//("持有中",301),
+    APPLY_REJECT                    = 62;//("单据申请白条被拒绝",302),
+    IOU_FROZEN                      = 63;//("支付冻结中",303),
+    IOU_PAYMENT_REVOCATION          = 64;//("支付撤销中",304),
+    IOU_EXPIRED                     = 65;//("已到期",305),
+    IOU_PAYMENT                     = 66;//("已兑付",306),
+    PAY_SUCCESS                     = 67;//("支付成功",307),
+    IOU_OVERDUE                     = 68;//("已逾期",308),
+    WAIT_PAY                        = 69;//("等待兑付",309),
+    IOU_PAYMENT_HAVE_REVOCATION     = 70;//("支付已撤销",310);
+    ALL_CASH_FINISH                 = 71;//("已全部兑付",38),
+    IOU_APPLY_REVOKED               = 72;//申请白条撤销
+
+    //    ADANCE_HOLD                     = 80;//("预付款持有中，等待核心确认")
+    //    ADANCE_CORE_AGREE               = 81;//("预付款持有中，核心确认")
+    //    ADANCE_APPLY_IOU                = 82;//("预付款申请白条")
+    //    ADANCE_CORE_REJECT_IOU          = 83;//("预付款白条申请拒绝")
+    //    ADANCE_CORE_AGREE_IOU           = 84;//("核心确认白条")
+    //    ADANCE_EDIT                     = 85;//("预付款编辑")
+    //    ADANCE_CANCEL                   = 86;//("撤销")
+    //    ADANCE_INVEST_AGREE_IOU         = 87;//("资金方确认白条")
+    //    ADANCE_INVEST_REJECT_IOU        = 88;//("资金方拒绝白条")
+    //    ADANCE_CORE_IOU_HOLD            = 89;//("预付款核心持有白条")
+    //    ADANCE_BANK_CHECK               = 90;//("银行审核中")
+    //    ADANCE_INVEST_APPLY             = 91;//("预付款资金方申请兑付")
+    //    ADANCE_CASHED                   = 92;//("预付款经销商兑付成功")
+    //    ADANCE_CORE_APPLY_IOU_CASHED    = 93;//("核心申请白条兑付")
+    //    ADANCE_INVEST_IOU_CASHED        = 94;//("资金方兑付白条")
+
+    BLANK_NOTE_INVALID  = 80;//("白条作废",130),
+    BLANK_NOTE_IN_APPLYING = 81;// ("白条申请中待核心企业确认",131),
+    CORE_REFUSE_CONFIRM_BLANK_NOTE = 82;// ("核心企业拒绝确认白条",132),
+    WAIT_BANK_CONFIRM_BLANK_NOTE = 83;//("待银行确认白条",133),
+    WAIT_INVEST_CONFIRM_BLANK_NOTE = 84;//("待投资机构确认白条",134),
+    BANK_REFUSE_CONFIRM_BLANK_NOTE = 85;//("银行拒绝确认白条",135),
+    INVEST_REFUSE_CONFIRM_BLANK_NOTE = 86;//("投资机构拒绝确认白条",136),
+    BANK_AGREE_CONFIRM_BLANK_NOTE = 87;//("银行同意确认白条",137),
+    INVEST_AGREE_CONFIRM_BLANK_NOTE = 88;//("投资机构同意确认白条",138),
+    DOWN_HOLD_BLANK_NOTE = 89;//("下游持有白条",140),
+    CORE_HOLD_BLANK_NOTE = 90;//("核心企业持有白条",141),
+    BLANK_HAD_HONOUR = 91;//("白条已经兑付",151),
+    FUND_BANK = 92;//("资金方类型银行",1),
+    FUND_INVEST = 93;// ("资金方类型投资机构",2),
+    PAYMENT_ONLINE = 94;//("付款方式线上",1),
+    PAYMENT_OFFLINE = 95;//("付款方式线下",2),
+    APPLY_HONOUR = 96;//("申请兑付中",120),
+    EXPIRE = 97;// ("已到期",121),
+    OVERDUE = 98;//("已逾期",122),
+
+    PAYMENT_INVALID = 99;//("预付款作废",60),
+    WAIT_CORE_CONFIRM_PAYMENT = 100;//("待核心企业确认预付款",61),
+    CORE_REFUSE_CONFIRM_PAYMENT = 101;//("核心企业拒绝确认预付款",62),
+    DOWN_HOLDING_PAYMENT = 102;//("下游企业持有预付款",70),
+    ADVANCE_BLANK_IN_APPLYING = 103;//("预付款申请白条中",92),
+    ADVANCE_BLANK_FINISH_APPLYING = 104;//("预付款申请白条完成",93),
+    INVEST_HOLD_ADVANCE = 105;//("投资机构持有预付款",100),
+    DOWN_ADVANCE_WAIT_HONOUR = 106;//("下游企业预付款待兑付",101),
+    ADVANCE_PAYMENT_HAD_HONOUR = 107;// ("预付款已兑付",110),
+    IN_APPLYING = 108;//("预付款申请白条中",1),
+    FINISH_APPLY = 109;//("预付款申请白条完成",2),
+    UN_FINISH = 110;//("未完成单据",100),
+    HAD_FINISH = 111;//("已完成单据",101),
+
+    DIRECTIONAL_BILL_LIST_FINISH = 112;//("定向融资单据挂牌完成",39),
+    DIRECTIONAL_BILL_FINISH_SUBSCRIBE = 113;//("定向融资单据挂牌认购完成",41),
+    DIRECTIONAL_BILL_CANCLE = 114;//("定向融资挂牌单据撤牌",40),
+    DIRECTIONAL_BILL_REFUSE = 115;//("定向融资单据被投资机构拒绝",42),
+}
+enum OperationType {
+    UNKNOW_OP               = 0;
+    ADD_BILL                = 1;//"登记单据"
+    CANCEL_ADD_BILL         = 2;//"撤销登记单据"
+    UPDATE_BILL             = 3;//"修改单据",5),
+    CONFIRM_AGREE_SIGN      = 4;//("确认签收单据",6),
+    REFUSE_SIGN             = 5;//("拒绝签收单据",7),
+    TRANSFER_WAIT_CONFIRM   = 6;//("转让单据待确认",8),
+    TRANSFER_EDIT           = 7;//("转让单据被拒后编辑",56),
+    AGREE_TRANSFER_CONFIRM  = 8;//("核心企业同意转让",9),
+    REFUSE_TRANSFER_CONFIRM = 9;//("核心企业拒绝转让",10),
+    WAIT_TRANSFER_SIGN      = 10;//("转让单据待发行机构确认",11),
+    AGREE_TRANSFER_SIGN     = 11;//("发行机构同意签收单据",12),
+    REFUSE_TRANSFER_SIGN    = 12;//("发行机构拒绝签收单据",13),
+    CANCEL_TRANSFER_CONFIRM = 13;//("核心企业撤销确认单据",14),
+    TRANSFER_TO_PRODUCT     = 14;//("转化为产品",15),
+    //等待核心企业确认的状态时上游企业可以撤销
+    TOP_CANCLE_CONFIRM      = 15;//("上游企业撤销确认",21),
+    UPDATE_PRODUCT          = 16;//("编辑产品",55),
+    //产品部分操作状态
+    AGREE_TO_GUARANTEE      = 17;//("担保机构确认担保",16),
+    REFUSE_TO_GUARANTEE     = 18;//("担保机构拒绝担保",17),
+    AGREE_TO_TRUST          = 19;//("托管机构确认托管",18),
+    REFUSE_TO_TRUST         = 20;//("托管机构拒绝托管",19),
+    //发行机构撤销操作
+    ISSUER_REVOKE           = 21;//("发行机构撤销操作",20),
+    //发行机构挂牌操作
+    ISSUER_LISTING_CONFIRM  = 22;//("发行机构挂牌确认操作",22),
+    //发行机构撤牌操作
+    ISSUER_WITHDRAWAL       = 23;//("发行机构撤牌操作",23),
+    //提前兑付
+    OP_ADVANCE_PAYMENT      = 24;//("提前兑付",63),
+    //到期兑付
+    OP_EXPIRE_PAYMENT       = 25;//("到期兑付",64),
+    //逾期兑付
+    OP_OVERDUE_PAYMENT      = 26;//("逾期兑付",65),
+    //
+    OPERATION_SUCCESS       = 27;//("操作成功",0),
+    OPERATION_FAIL          = 28;//("操作失败",1),
+    PRODUCT_DELISTING       = 29;//("产品摘牌",70),
+    BILL_DELISTING          = 30;//("单据摘牌",71),
+    //提现操作
+    WITHDRAW_APPLY          = 31;//("提现",201),
+
+    //白条
+    IOU_APPLY                   = 32;//("申请白条",31),
+    IOU_APPLY_AGAIN             = 33;//("重新申请白条",32),
+    IOU_APPLY_REVOKE            = 34;//("撤销申请白条",33),
+    IOU_PAY                     = 35;//("支付操作",34),
+    IOU_PAY_CONFIRM             = 36;//("确认支付操作",35),
+    IOU_PAY_REVOKE              = 37;//("支付撤销",36),
+    IOU_AGREE_PAY_REVOKE        = 38;//("同意支付撤销",37),
+    IOU__REJECT_PAY_REVOKE      = 39;//("拒绝支付撤销",38),
+    IOU_APPLY_CASH              = 40;//("申请兑付",39),
+    IOU_AGREE_APPLICATION       = 41;//("同意白条申请",40),
+    IOU_REFUSE_APPLICATION      = 42;//("拒绝白条申请",41);
+
+    SET_CREDIT                  = 43;//授信额度成功
+    UPDATE_CREDIT               = 44;//修改额度成功
+    BILL_LIST                   = 45;//("单据挂牌",91),
+    BILL_CANCEL_LIST            = 46;//("单据撤牌",92);
+
+    IOU_ADVANCE_PAYMENT         = 47;//("白条提前兑付",42),
+    IOU_EXPIRE_PAYMENT          = 48;//("白条到期兑付",43),
+    IOU_OVERDUE_PAYMENT         = 49;//("白条逾期兑付",44),
+
+    //单据支付兑付相关操作
+    BILL_HANDLE_PAY             = 50;//("单据支付",100),
+    BILL_CONFIRM_PAY            = 51;//("单据确认支付",101),
+    BILL_CANCEL_PAY             = 52;//("单据撤销支付", 102),
+    BILL_AGREE_CANCEL_PAY       = 53;//("单据同意撤销支付", 103),
+    BILL_REFUSE_CANCEL_PAY      = 54;//("单据拒绝撤销支付", 104),
+    BILL_APPLY_HONOUR           = 55;//("单据申请兑付", 105),
+    BILL_ADVANCE_PAYMENT        = 56;//("单据提前兑付",106),
+    BILL_EXPIRE_PAYMENT         = 57;//("单据到期兑付",107),
+    BILL_OVERDUE_PAYMENT        = 58;//("单据逾期兑付",108);
+
+
+    //预付款操作
+    OP_ADANCE_REG              = 60;//("预付款登记")
+    OP_ADANCE_CORE_AGREE       = 61;//("预付款核心确认")
+    OP_ADANCE_CORE_REJECT      = 62;//("预付款核心拒绝")
+    OP_ADANCE_EDIT             = 63;//("预付款重新编辑")
+    OP_ADANCE_CACEL            = 64;//("预付款撤销")
+    OP_ADANCE_APPLY_IOU        = 65;//("预付款申请白条")
+    OP_ADANCE_CORE_REJECT_IOU       = 66;//("预付款核心拒绝白条")
+    OP_ADANCE_EDIT_IOU              = 67;//("预付款编辑白条")
+    OP_ADANCE_CANCEL_IOU              = 68;//("预付款撤销白条")
+    OP_ADANCE_INVEST_AGREE_IOU       = 69;//("预付款资金方同意白条")
+    OP_ADANCE_INVEST_REJECT_IOU       = 70;//("预付款资金方拒绝白条")
+    OP_ADANCE_INVEST_CASH       = 71;//("预付款资金方申请兑付")
+    OP_ADANCE_CORE_CASH_IOU       = 72;//("预付款核心申请兑付白条")
+    OP_ADANCE_DOWN_PAY       = 73;//("预付款下游企业同意兑付单据")
+    OP_ADANCE_INVEST_PAY_IOU       = 74;//("预付款资金方同意兑付白条")
+
+    //单据定向融资
+    DIRECTIONAL_BILL   = 75;//("定向融资单据挂牌",90),
+    DIRECTIONAL_BILL_DELISTING  = 76;//("定向融资单据摘牌",72),
+    DIRECTIONAL_BILL_CANCEL_LIST = 77;//("定向融资单据撤牌",93),
+    DIRECTIONAL_BILL_INVEST_REFUSE = 78;//("定向融资投资机构拒绝",94),
+}
+message ResultReceipt {
+    ZsgjReceipt receipt = 1;
+}
+message ResultProduct{
+    ZsgjProduct product = 1;
+}
+message ResultAssetRegister{
+    AssetRegisterAction asset =1;
+}
+message ResultWithdraw{
+    ZsgjApplyWithdraw  withdraw=1;
+}
+message ResultRecharge{
+    ZsgjApplyRecharge recharge=1;
+}
+message ResultPsnCertification{
+    ZsgjPersonCertification psnCertification =1;
+}
+message ResultCpyCertification{
+    ZsgjCompanyCertification cpyCertification=1;
+}
+message ResultCash{
+    ZsgjCash cash=1;
+}
+message ResultClear{
+    ZsgjClear clear=1;
+}
+message ResultDelist{
+    ZsgjDelist delist=1;
+}

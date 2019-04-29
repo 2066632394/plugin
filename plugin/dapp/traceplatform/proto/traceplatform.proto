@@ -1,0 +1,44 @@
+syntax = "proto3";
+package types;
+
+message TraceplatformAction{
+    oneof value{
+        TraceplatformAddGood              traceplatformAddGood          = 1;//商品信息上链
+        TraceplatformAddGoods             traceplatformAddGoods         = 2;//商品批量上链 同一种类的批量添加
+        TraceplatformCommon               traceplatformCommon           = 3;//通用信息存证
+    }
+    int32 Ty = 50;
+}
+
+message TraceplatformAddGood {
+    TraceplatformGoodInfo goodinfo = 1;
+ }
+
+message TraceplatformAddGoods {
+    string name = 1;//
+    repeated string nfcCode = 2;//
+    string goodinfo = 3 ;//json字符串  用户自定义json结构 批量只支持同一种类的批量添加
+}
+
+message TraceplatformGoodInfo {
+    string name = 1;//
+    string nfcCode = 2;//NFC编码
+    int64 amount = 3;//数量
+    string goodinfo = 4 ;//json字符串  用户自定义json结构 最好一种商品一种格式  方便解析
+}
+
+message TraceplatformCommon {
+    string  key  = 1;
+    string  value = 2;
+}
+
+message TraceplatformNfcCodeIndex {
+    string nfc = 1;
+    string addr = 2;//
+    int64 height = 3;//
+    int32 ty = 4;//
+}
+
+message TraceplatformNfcCodeIndexList {
+    repeated TraceplatformNfcCodeIndex list = 1;
+}

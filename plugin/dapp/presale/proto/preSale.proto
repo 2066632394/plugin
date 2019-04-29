@@ -1,0 +1,373 @@
+syntax="proto3";
+
+package types;
+//key marketid
+message PreSaleMarketInfo{
+    string marketName   =1;//商家名称
+    int64  marketId     =2;//商家ID
+    string contact      =3;//联系人
+    string phoneNum     =4;//联系人电话
+    repeated PreSaleCurrency currency= 5;
+    PreSaleOpreation operate= 6;
+    PreSaleToken token = 7;
+    bool isTokenSup = 8;//是否支持TOKEN
+}
+
+message PreSaleToken{
+    int64  marketId     =1;
+    int64  useAble    =2;//可用
+    int64  tokenFrozen  =3;//代币冻结数量
+}
+
+//adminid
+message PreSaleAdminInfo{
+    string adminName   =1;//管理员注册
+    int64  adminId     =2;//
+    string status      =3;//进行的操作
+}
+
+message PreSaleCurrency{
+    string currencyName =1;
+    string address     =2;
+    int64  useAble     =3;
+    int64  frozen      =4;
+}
+
+//uid
+message PreSaleUserInfo{
+    string name         =1;
+    string email        =2;
+    string phoneNum     =3;
+    int64  uid          =4;
+    // PreSaleCurrency  eth   =5;
+    // PreSaleCurrency  bty   =6;
+    repeated PreSaleCurrency currency=6;
+    PreSaleOpreation operate=7;
+    repeated PreSaleToken token =8;
+    string uuid     =9;//用户唯一表示符    
+    repeated PreSaleAddress address=10;    
+}
+
+message PreSaleAddress{
+    string userName         =1;
+    string phoneNum         =2;
+    string address          =3;  //地址
+    int64  addressId        =4; 
+}
+
+message PreSaleOpreation{
+    int64  time         =1;//最新进行操作的时间
+    string fromAddress  =2;
+    string toAddress    =3;
+    string status       =4;//进行操作的内容
+    string  minerFee     =5;
+}
+//pdId
+message PresalePdInfo{
+    string pdName   =1;//产品名称
+    int64  pdId     =2; //产品编号
+    int64  price    =3; //token价格
+    int64  deposit  =4; //定金
+    int64  psStart  =5; //预售开始
+    int64  psEnd  	=6; //预售结束
+    int64  puStart  =7; //提货开始
+    int64  puEnd    =8; //提货结束
+    int64  marketId  =9;   //商家id
+    string marketName =10;  //商家名称
+    int64  adminId    =11;  //添加产品的工作人员ID
+    string status     =12; //“上线” “下线”“未上线”  
+}
+//todo 价格的形式还没定好
+//orderId
+message PreSaleOrderInfo{
+    int64  orderId          =1; //订单编号
+    int64  pdId             =2; //产品编号
+    int64  uid              =3; //用户
+    int64  marketId         =4; 
+    int64  tokenAmount      =5; //定金 token 商家给卖家 一共转的数量
+    // int64  btyAmount   		=6; //bty 买家给商家 一共转的数量
+    // int64  ethAmount   		=7; //eth 买家给商家 一共转的数量
+    PreSaleAmount book =6;
+    PreSaleAmount lastPay =7;
+    string userName         =8;
+    string phoneNum         =9;
+    string address          =10; //地址
+    string marketStatus     =11; //" " “已发货”
+    string userStatus       =12; //第三种状态"待发货" “已预订”  "已收货" "" 用户： 已预订 待提货 待收货 已收货 订单取消 订单过期
+    string express          =14; //快递公司
+    string ordNum           =15; //快递单号
+    int64 expressTime       =16; //发货时间
+    string adminId          =17;
+    int64 operateTime       =18; //预订时间和付尾款时间
+    string status           =19; //进行的操作
+    int64  pdAmount         =20;//购买的数量
+    int64  psStart  =21; //预售开始
+    int64  psEnd  	=22; //预售结束
+    int64  puStart  =23; //提货开始
+    int64  puEnd    =24; //提货结束
+}
+
+message PreSaleAmount{
+    string currencyName=1;
+    int64  amount=2;
+}
+
+message WithDrawPreSale{
+    int64   id          =1;//用户id
+    int64   amount      =2;
+    string  toAddress   =4;//
+    bool    isMarket    =5;//true是market
+    string  currency    =6;//"bty"或者"eth"
+    bool    isToken     =7;//true是token false是虚拟币
+    int64   time        =8;
+}
+
+//资产信息要不要上链 我觉得不用上链
+//商家id和用户id可以一致
+//payload
+message PreSale{
+    oneof value{
+        PreSaleMarketReg       marketReg        =1;//商家注册             商家操作 （需要非token）(需要看看)
+        PreSaleAdminReg        adminReg         =2;//工作人员注册         管理员操作(需要看看)
+        PreSaleUserReg         userReg          =3;//用户注册             用户操作
+
+        PreSaleMarketRec       marketRec        =4;//商家充值             商家操作 
+        PreSaleUserRec         userRec          =5;//用户充值             用户操作
+
+
+        PreSaleAddPdInfo       addPdInfo        =6;//工作人员发布预售产品   商家操作 （需要非token）
+        PreSaleOnOffPd         onOffPd          =7;//工作人员 上下线   这里是上线下线状态（即将开始 预售中 提货中 已结束）  工作人员操作
+
+        PreSaleUserPay         userPay          =8;//1.用户预订 2.付尾款   预订是需要添加收货地址和电话 付尾款不必要信息为初始值  这是待提货状态  已预订状态  （需要非token） (需要看看)
+        PreSaleAddAddress      address          =9;//用户添加收货地址   用户操作
+        PreSaleOrderTrans      orderTrans       =10;//用户订单转让      用户操作(需要看看)
+        PreSaleMarketShip      marketShip       =11;//工作人员发货      工作人员操作
+
+        PreSaleLogistics       logistics        =12;//商家添加物流信息   这是待收货状态   商家操作
+        PreSaleUserRecipt      userRecipt       =13;//用户收货   已收货状态     用户操作（需要非token） (需要看看) {自动收货}
+        PreSaleOverDue         overDue          =14;//系统添加订单过期          商家操作（需要非token） (需要看看)  (bug:用户冻结资产不足)
+        PreSaleWithDraw        withDraw         =15;//用户提币                 用户操作
+        PreSaleChangePd        changePd         =16;//修改产品信息 以及 删除产品消息  商家操作（需要非token）
+        PreSaleUserTokenWithDraw    userTokenWithDraw     =17;//用户提token，用户操作
+        PreSaleUserShip        userShip         = 18;//用户提货
+     }
+    int32 ty=99;
+}
+
+//id存本地数据库    商家信息上链  
+message PreSaleMarketReg{
+    string marketName   =1;//商家名称
+    int64  marketId     =2;//商家ID
+    string contact      =3;//联系人
+    string phoneNum     =4;//联系人电话
+    // string btyAddress   =5;//bty地址
+    // string ethAddress   =6;//eth地址
+    repeated CoinInfo currency  =5;
+    bool isTokenSup = 6;//是否支持TOken
+}
+
+message CoinInfo{
+    string name =1;//BTY
+    // int64  coinId=2;
+    string Address=3;//地址
+}
+
+//id存本地数据库     管理员姓名上链
+message PreSaleAdminReg{
+    string adminName   =1;//管理员注册
+    int64  adminId     =2;//管理员id
+}
+
+//id存本地数据库    用户信息上链  
+message PreSaleUserReg{
+    string name         =1;//用户名
+    string email        =2;
+    string phoneNum     =3;//不必需
+    int64  uid          =4;
+    // string btyAddress   =5;//bty地址
+    // string ethAddress   =6;//eth地址
+    repeated CoinInfo currency  =5;
+    string uuid         =7;//用户唯一标识符
+}
+
+//放入本地数据库 充值操作上链 数量不上链  确认pubkey是否与market一致 
+message PreSaleMarketRec{
+    int64  marketId     =1;
+    int64  amount       =2;
+    string currency     =3;   //eth 和 bty
+    bool   isToken      =4;   //是否为币种所对应的代币 true是充值token false是充值eth或bty
+    int64  time         =5;   //充值的时间
+    string toAddress    =6;   //平台上 商家的两种地址  todo是否对应商家的地址
+}
+ 
+
+message PreSaleUserRec{
+    int64  uid          =1;
+    // int64  marketId     =2;//需要充值的商家代币 直接冲eth bty 可为空
+    int64  amount       =2;    
+    int64  time         =3;
+    string currency     =4;   //bty 和 ETH
+    // bool   isToken      =6;   //是否为币种所对应的代币
+    string toAddress    =5;   //平台上 用户的两种地址  todo是否对应用户的地址
+}
+
+//上链：在这里需要添加货单状态为未上线 货单信息上链 
+message PreSaleAddPdInfo{
+    string pdName   =1; //产品名称
+    int64  pdId     =2; //产品编号
+    int64  price    =3; //token价格
+    int64  deposit  =4; //定金
+    int64  psStart  =5;
+    int64  psEnd    =6;
+    int64  puStart  =7;
+    int64  puEnd    =8;
+    int64  marketId  =9;    //商家id
+    string marketName =10;  //商家名称
+    int64  adminId    =11;  //添加产品的工作人员ID
+    string status     =12; //"待上线" "上线"
+}
+
+//上链 存本地数据库  如果下线了就不能买了
+message PreSaleOnOffPd{
+    int64   pdId=1;//产品号
+    bool    status=3; //false下线 true上线  一上线的产品不能重复添加
+    int64   adminId=4;
+    int64   time=5;//操作时间
+}
+
+//判断产品是否下架  这里要做很多资产判断
+message PreSaleUserPay{
+    int64  orderId          =1; //订单编号
+    int64  pdId             =2; //产品编号
+    int64  uid              =3; //用户
+    // int64  currencyId       =4; //代币id  1："bty"  2:"eth"
+    string currencyName     =4;
+    int64  tokenAmount      =5; //定金 token 商家给买家
+    int64  currencyAmount   =6;//bty或者eth 买家给商家
+    PreSalePayType payId    =7; //（1；付定金；2：付尾款）
+    int64  Time             =11;
+    int64  marketId         =12;
+    int64  addressId        =13;//这里是付尾款的时候添加 地址id  同下面的PreSaleAddAddress
+    int64  amount           =14;//预订的数量
+}
+
+enum PreSalePayType{
+    PreSaleErr     =0;
+    PreSalePayBook =1;  //付定金
+    PreSalePayLast =2;  //付尾款
+}
+
+message PreSaleAddAddress{
+    string userName         =1;
+    string phoneNum         =2;
+    string address          =3;  //地址
+    int64  uid              =4;
+    int64  addressId        =5;//地址id  添加地址时会标志id  1；address1 2:address2
+    // int64  orderId          =5;
+}
+
+message PreSaleOrderTrans{
+    int64   orderId=1;
+    string  toUUid  =2;      //转让的标识符
+    // string fromUUid =3;//用户的UUid
+    int64   uid    =4;
+    int64   toUid  =5;//接受者的id
+    int64  time   =6;//进行操作的时间
+    int64  newOrderId =7;
+}
+
+message PreSaleMarketShip{
+    int64  orderId=1;
+    int64  adminId=2;//marketId
+    int64  time  =3;  //发货时间
+    string express=4; //快递公司
+    string ordNum =5; //快递单号
+    // int64  time   =6; //发货时间
+}
+
+message PreSaleLogistics{
+    int64  orderId=1;
+    string express=2; //快递公司
+    string ordNum =3; //快递单号
+    int64  time   =4; //发货时间
+    int64  marketid =5;
+}
+message PreSaleUserRecipt{
+    int64  orderId=1;
+    int64  time   =2; //收货时间
+    int64  uid    =3;
+}
+
+message PreSaleOverDue{
+    repeated int64  orderId =1;    //订单编号
+    int64  time=3;   //时间
+}
+
+message PreSaleWithDraw{
+    int64   id          =1;//用户id
+    int64   amount      =2;
+    string  toAddress   =4;
+    bool    isMarket    =5;//true是market
+    string  currency    =6;//"bty"或者"eth"
+    bool    isToken     =7;//true是token false是虚拟币
+    int64   time        =8;
+    string   minerFee    =9;//矿工费
+}
+
+message PreSaleChangePd{
+    string pdName   =1;//产品名称
+    int64  pdId     =2; //产品编号
+    int64  price    =3; //token价格
+    int64  deposit  =4; //定金
+    int64  psStart  =5;
+    int64  psEnd    =6;
+    int64  puStart  =7;
+    int64  puEnd    =8;
+    int64  marketId  =9;    //商家id
+    string marketName =10;  //商家名称
+    int64  adminId    =11;  //添加产品的工作人员ID
+    string status     =12; //"已下线" "已上线"
+    bool   isDelete   =13;//true是删除  false是修改
+}
+
+message PreSaleUserTokenWithDraw{
+    int64 uid = 1;//用户id
+    int64 marketId = 2;//商家id  暂时支持token以marketId标识区分
+    int64 amount =3;//提币数量
+    string address = 4;//
+}
+
+message PreSaleUserShip {
+    int64 uid = 1;//
+    int64 oid = 2;//
+    int64 addressId = 3;//
+}
+
+//log
+message MarketInfoPreSale{
+    PreSaleMarketInfo  marketInfo =1;
+}
+
+message AdminInfoPreSale{
+    PreSaleAdminInfo adminInfo=1;
+}
+
+message UserInfoSale{
+    PreSaleUserInfo userInfo=1;
+}
+
+message PdInfoPresale{
+    PresalePdInfo pdInfo=1;
+}
+
+message OrderInfoPreSale{
+    PreSaleOrderInfo orderInfo=1;
+}
+
+message OverDuePreSale{
+    repeated int64 order=1;
+}
+
+message WithDrawPS{
+    PreSaleWithDraw withDrawInfo=1;
+}

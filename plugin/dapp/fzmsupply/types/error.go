@@ -1,0 +1,61 @@
+package types
+
+import (
+	"errors"
+)
+
+var (
+	//supplychain
+	ErrDocodeErr            = errors.New("data decode error")
+	ErrWrongActionType		= errors.New("wrong action type")
+	ErrEmptyValue			= errors.New("empty value")
+	ErrWrongPubkey			= errors.New("wrong pubkey")
+	//区块链系统异常
+	ErrStorage = errors.New("区块链存储异常")
+	//签名数据错误
+	ErrSign = errors.New("加密验证不通过")
+	ErrDupInstructionId = errors.New("重复的操作编号")
+	ErrWrongMessageType = errors.New("无效的消息类型")
+	ErrAuthenticate = errors.New("操作人编号与公钥不一致")
+	ErrWrongValue = errors.New("请求体数据错误")
+	ErrNullSign = errors.New("加密数据为空")
+	ErrWrongVersion = errors.New("错误的区块链版本号")
+	ErrSignWrongLength = errors.New("错误的签名长度")
+	//逻辑对象错误
+	ErrPlatformExist = errors.New("平台已初始化")
+	ErrPlatformNotExist = errors.New("平台未初始化")
+	ErrAdminExist = errors.New("管理员编号已占用")
+	ErrAdminNotExist = errors.New("管理员不存在")
+	ErrRoleExist = errors.New("角色编号已占用")
+	ErrRoleNotExist = errors.New("角色不存在")
+	ErrOfficialExist = errors.New("业务员编号已存在")
+	ErrOfficialNotExist = errors.New("业务员不存在")
+	ErrUserExist = errors.New("用户编号已占用")
+	ErrUserNotExist = errors.New("用户不存在")
+	ErrAssetExist = errors.New("资产编号已占用")
+	ErrAssetNotExist = errors.New("资产不存在")
+	ErrFinanceExist = errors.New("融资编号已占用")
+	ErrFinanceNotExist = errors.New("融资记录不存在")
+	ErrPaymentExist = errors.New("支付编号已占用")
+	ErrPaymentNotExist = errors.New("支付记录不存在")
+	ErrMortgageExist = errors.New("质押编号已占用")
+	ErrMortgageNotExist = errors.New("质押记录不存在")
+	ErrBatchExist = errors.New("兑付编号已占用")
+	ErrWithdrawExist = errors.New("出金编号已占用")
+	ErrWithdrawNotExist = errors.New("出金记录不存在")
+	//区块链逻辑判断不通过
+	ErrIllegalAmount = errors.New("非法数据")
+	ErrRmbNotEnough = errors.New("帐户资金不足")
+	ErrWrongAmount = errors.New("错误的数额")
+	ErrNoRight = errors.New("没有权限")
+	ErrNoRecord = errors.New("空记录")
+	ErrAssetCreditNotEnough = errors.New("资产信用额度不足")
+	ErrWrongAssetType = errors.New("错误的资产类型")
+	ErrWrongRight = errors.New("非法的权限类型")
+	ErrAmountNotEnough = errors.New("可用资产数额不足")
+	ErrWrongPaymentState = errors.New("错误的支付状态")
+	ErrWrongFinanceState = errors.New("错误的融资状态")
+	ErrWrongAssetState = errors.New("错误的资产状态")
+	ErrWrongMortgageState = errors.New("错误的质押状态")
+	ErrWrongWithdrawState = errors.New("错误的出金状态")
+)

@@ -1,0 +1,143 @@
+syntax = "proto3";
+
+package types;
+import "validator/validator.proto";
+
+//合同状态
+enum ContractStatus {
+    CS_Unknown = 0;
+    CS_Ineffective = 1;//未生效
+    CS_Effective = 2;//生效
+    CS_Disused = 3;//被拒绝，废弃
+    CS_Draft = 4;//草稿
+    CS_Canceled = 5;//发起者取消
+}
+
+//签名状态
+enum SignStatus {
+    SS_Unknown = 0;
+    SS_Unsigned = 1;//未签
+    SS_Signed = 2;//已签
+    SS_Rejected = 3;//拒绝
+}
+
+//合同链动作
+message ContractAction{
+	oneof value {
+        ContractCreate create = 1;//发起合同
+        ContractCancel cancel = 2;//撤销合同
+        ContractModify modify = 3;//修改合同
+        ContractSign sign = 4;//签名
+        ContractReject reject = 5;//拒签
+//        ContractRegister register = 6;//用户认证
+	}
+	int32 ty = 100;
+}
+
+enum ContractActionType {
+    AT_Unknown = 0;
+    AT_Create = 1;
+    AT_Cancel = 2;
+    AT_Modify = 3;
+    AT_Sign = 4;
+    AT_Reject = 5;
+//    AT_Register = 6;
+}
+
+//发起合同，操作者签名
+message ContractCreate {
+    string operatorId = 1 [(validator.field) = {string_not_empty: true}];//操作者名或uid
+    string contractId = 2 [(validator.field) = {string_not_empty: true}];//合同id
+    string contractHash = 3 [(validator.field) = {length_eq: 128, human_error: "ErrHash"}];//合同hash
+    string contractName = 4 [(validator.field) = {string_not_empty: true}];//合同名
+    uint64 amount = 5 [(validator.field) = {int_gt: 0}];//合同金额
+    repeated string signatoryIds = 6 [(validator.field) = {repeated_count_min: 1, string_not_empty: true}];//待签名企业信息
+    bool isDraft = 7;//是否为草稿
+    string signedContractHash = 8;//若不为草稿，即isDraft==false, 则为发起者签名后的合同hash
+    uint64 operateTime = 9 [(validator.field) = {int_gt: 0}];//发起时间
+}
+
+//撤销合同，操作者签名，仅当所有签署者均未签名时可操作
+message ContractCancel {
+    string operatorId = 1 [(validator.field) = {string_not_empty: true}];//操作者名或uid
+    string contractId = 2 [(validator.field) = {string_not_empty: true}];//合同id
+    uint64 operateTime = 3 [(validator.field) = {int_gt: 0}];//撤销时间
+}
+
+//修改合同，操作者签名，仅当所有签署者均未签名时可操作
+message ContractModify {
+    string operatorId = 1 [(validator.field) = {string_not_empty: true}];//操作者名或uid
+    string contractId = 2 [(validator.field) = {string_not_empty: true}];//合同id
+    string contractHash = 3;//合同hash，空则不修改
+    string signedContractHash = 4;//发起者签名后的合同hash，空则不修改。当上一条合同hash不为空，且合同状态不为草稿时，该条不能为空
+    string contractName = 5;//合同名，空则不修改
+    uint64 amount = 6;//合同金额，空则不修改
+    repeated string signatoryIds = 7 [(validator.field) = {string_not_empty: true}];//待签名企业信息，空则不修改
+    uint64 operateTime = 8 [(validator.field) = {int_gt: 0}];//修改时间
+}
+
+//签署合同，操作者签名
+message ContractSign {
+    string operatorId = 1 [(validator.field) = {string_not_empty: true}];//操作者名或uid
+    string contractId = 2 [(validator.field) = {string_not_empty: true}];//合同id
+    string signedContractHash = 3 [(validator.field) = {length_eq: 128, human_error: "ErrHash"}];//发起者签名后的合同hash
+    uint64 operateTime = 4 [(validator.field) = {int_gt: 0}];//签署时间
+}
+
+//拒绝合同，操作者签名
+message ContractReject {
+    string operatorId = 1 [(validator.field) = {string_not_empty: true}];//操作者名或uid
+    string contractId = 2 [(validator.field) = {string_not_empty: true}];//合同id
+    uint64 operateTime = 3 [(validator.field) = {int_gt: 0}];//拒绝时间
+}
+
+////用户认证，用管理员公私钥对签名
+//message ContractRegister {
+//    string id = 1 [(validator.field) = {string_not_empty: true}];//用户id
+//    string name = 2 [(validator.field) = {string_not_empty: true}];//用户名
+//    string pubKey = 3 [(validator.field) = {length_eq: 64}];//用户公钥
+//}
+
+//合同信息
+message Contract {
+    string contractId = 1;
+    string contractHash = 2;
+    string contractName = 3;
+    uint64 amount = 4;
+    Creator creator = 5;
+    repeated Signatory signatories = 6;
+    uint64 createTime = 7;
+    uint64 updateTime = 8;
+    ContractStatus status = 9;
+}
+
+//发起者
+message Creator {
+    string id = 1;
+    string contractHash = 2;//签名后的合同hash
+//    string name = 3;
+    SignStatus signStatus = 3;
+    uint64 signTime = 4;
+    uint64 cancelTime = 5;
+}
+
+//签署者
+message Signatory {
+    string id = 1;
+    string contractHash = 2;//签名后的合同hash
+//    string name = 3;
+    SignStatus signStatus = 3;
+    uint64 signTime = 4;
+    uint64 rejectTime = 5;
+}
+
+//用户信息
+//message User {
+//    string id = 1;
+//    string name = 2;
+//    string pubKey = 3;
+//}
+
+message ReqId {
+    string id = 1;
+}

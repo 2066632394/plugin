@@ -1,0 +1,34 @@
+syntax = "proto3";
+package types;
+
+message HackerAction{
+    oneof value{
+        HackerAddBill              addBill          = 1;//商品信息上链
+    }
+    int32 Ty = 50;
+}
+
+message HackerAddBill {
+    string stockNumber = 1;
+    string stockName   = 2;
+    string brand       = 3;
+    string batchRequest = 4;
+    string pledgeRate   =5;
+    string basicUnit = 6;
+    string commodityCode = 7;
+    string expirationDate = 8;
+    string  pledgePrice = 9;
+    string earlyWarningDate = 10;
+    string specification = 11;
+}
+
+message HackerBillIndex {
+    string stockNumber = 1;
+    string addr = 2;//
+    int64 height = 3;//
+    int32 ty = 4;//
+}
+
+message HackerNfcCodeIndexList {
+    repeated HackerBillIndex list = 1;
+}

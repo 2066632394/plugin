@@ -1,0 +1,459 @@
+syntax = "proto3";
+package types;
+
+enum MessageType {
+    MsgError = 0;
+    MsgInitPlatform = 1; //平台初始化
+    MsgCreateRole = 2; //创建后台角色
+    MsgUpdateRole = 3; //修改角色权限
+    MsgDeleteRole = 4; //删除角色
+    MsgCreateOfficial = 5; //创建后台人员
+    MsgUpdateOfficial = 6; //修改后台人员权限
+    MsgDeleteOfficial = 7; //删除后台人员
+    MsgCreateCompany = 8; //企业用户注册
+    MsgCreateAsset = 9; //企业录入或修改资产
+    MsgExamineAsset = 10; //资产审核录入
+    MsgCancelAsset = 11; //企业撤销资产登记
+    MsgSetCredit = 12; //设置企业信用总额度
+    MsgExamineDeposit = 13; //审核企业入金
+    MsgApplyWithdraw = 14; //企业申请出金
+    MsgExamineWithdraw = 15; //企业出金初审
+    MsgReviewWithdraw = 16; //企业出金复审
+    MsgMortgage = 17; //申请质押资产
+    MsgCancelMortgage = 18; //撤销质押
+    MsgConfirmMortgage = 19; //摘取质押
+    MsgRedeem = 20; //赎回资产
+    MsgOverdue = 21; //设置逾期质押
+    MsgConfirmWithdraw = 22; //确认出金结果
+    MsgReceive = 23; //企业签收资产
+    MsgSell = 24;//挂牌
+    MsgCancel = 25; //撤销挂牌
+    MsgInvestAsset = 26; //摘牌
+    MsgPay = 27; //支付
+    MsgRecover = 28; //解除冻结状态
+    MsgCancelPay = 29; //撤销票据支付
+    MsgBatchCash = 30; //批量兑付
+    MsgOfflineCash = 31;//线下兑付
+}
+
+message Request {
+    oneof value{
+        RequestInitPlatform initPlatform = 1;
+        RequestCreateRole createRole = 2;
+        RequestUpdateRole updateRole = 3;
+        RequestDeleteRole deleteRole = 4;
+        RequestCreateOfficial createOfficial = 5;
+        RequestUpdateOfficial updateOfficial = 6;
+        RequestDeleteOfficial deleteOfficial = 7;
+        RequestCreateCompany createCompany = 8;
+        RequestCreateAsset createAsset = 9;
+        RequestExamineAsset examineAsset = 10;
+        RequestCancelAsset cancelAsset = 11;
+        RequestSetCredit setCredit = 12;
+        RequestExamineDeposit examineDeposit = 13;
+        RequestApplyWithdraw applyWithdraw = 14;
+        RequestExamineWithdraw examineWithdraw = 15;
+        RequestReviewWithdraw reviewWithdraw = 16;
+        RequestMortgage mortgage = 17;
+        RequestCancelMortgage cancelMortgage = 18;
+        RequestConfirmMortgage confirmMortgage = 19;
+        RequestRedeem redeem = 20;
+        RequestOverdue overdue = 21;
+        RequestConfirmWithdraw confirmWithdraw = 22;
+        RequestReceive receive = 23;
+        RequestSell sell = 24;
+        RequestCancel cancel = 25;
+        RequestInvestAsset investAsset = 26;
+        RequestPay pay = 27;
+        RequestRecover recover = 28;
+        RequestCancelPay cancelPay = 29;
+        RequestBatchCash batchCash = 30;
+        RequestOfflineCash offlineCash = 31;
+    }
+    string uid = 98;//调用者编号
+    int32 ty = 99;
+}
+
+enum RightType {
+    Rs_UNK = 0; //无效权限
+    RsExamineAsset = 1; //审核资产录入
+    RsSetCredit = 2; //设置企业信用总额度
+    RsExamineDeposit = 4; //审核企业入金
+    RsExamineWithdraw = 8; //企业出金初审
+    RsReviewWithdraw = 16; //企业出金复审
+}
+
+message Role {
+    string roleid = 1;	//角色编号
+    string roleName = 2;	//角色名
+    int32 rights = 3;	//角色权限集
+    bool active = 4; //是否处于激活状态
+}
+
+message Official {
+    string uid = 1; //后台人员编号
+    bytes pubkey = 2; //后台人员公钥
+    repeated string roleids = 3; //后台人员角色
+    string name = 4; //后台人员姓名
+    string certificate = 5; //后台人员身份证
+    bool active = 6; //是否处于激活状态
+    bool isAdmin = 7; //是否是管理员
+}
+
+message User {
+    bytes pubkey = 1; //用户和一个公钥绑定
+    string uid = 2; //用户唯一的编号
+    int64 rmb = 3; //资金余额
+    string userName = 4; //企业名字
+    string certificate = 5; //证件号码
+    string legalPerson = 6; //法人姓名
+    string legalCertificate = 7; //法人身份证号码
+    int64 totalCredit = 8; //审定总额度
+    int64 freezeRmb = 9; //冻结中资金
+}
+
+message Platform {
+    bytes pubkey = 1; //平台管理员公钥
+}
+
+enum AuditState {
+    Au_UNK = 0;
+    Au_Canceled = 1; //已撤销
+    Au_Waitting = 2; //待审核
+    Au_Passed = 3; //审核已通过
+    Au_Refused = 4; //审核已拒绝
+}
+
+enum WithdrawState {
+    Wi_UNK = 0;
+    Wi_Canceled = 1; //已撤销
+    Wi_Waitting = 2; //待审核
+    Wi_FirstPassed = 3; //初审已通过
+    Wi_FirstRefused = 4; //初审已拒绝
+    Wi_Passed = 5; //终审已通过
+    Wi_Refused = 6; //终审已拒绝
+    Wi_Successed = 7; //确认出金成功
+    Wi_Failed = 8; //确认出金失败
+}
+
+message Owner {
+    string userUid = 1; //持有人uid
+    int64 amount = 2; //资产份额
+    int64 rmb = 3; //支付资金
+}
+
+enum AssetState {
+    As_UNK = 0;
+    As_Canceled = 1; //已撤销
+    As_Normal = 2; //持有中
+    As_Unreceived = 3; //已拒绝接收
+    As_ApplyMortgage = 4; //申请质押中
+    As_Mortgaged = 5; //质押中
+    As_Finished = 6; //已完成
+}
+
+message Holder {
+    string userUid = 1; //权益人uid
+    int64 normalAmount = 2; //可支配权益数量
+    int64 applyAmount = 3; //申请兑付中数量
+    int64 financeAmount = 4; //融资中权益数量
+    int64 frozenAmount = 5; //冻结中权益数量
+    int64 mortgageAmount = 6; //质押中权益数量
+}
+
+message Asset {
+    string assetId = 1; //资产编号
+    string payer = 2; //付款企业uid
+    string receiver = 3; //收款企业uid
+    string guarantor = 4; //担保企业uid
+    int64 amount = 5; //应收帐总额
+    int64 startDate = 6; //出账日期
+    int64 endDate = 7; //承兑日期
+    AuditState audit = 8;
+    AssetState state = 9; //资产状态
+    int32 rate = 10; //借款利率
+    int64 credit = 11; //资产信用额
+    int64 usedCredit = 12; //已使用额度
+    string docHash = 13; //尽调报告哈希
+    string auditor = 14; //审核人uid
+    bool coreUser = 15; //是否为核心企业录入
+    repeated Holder holders = 16; //权益人列表
+    int64 Repayment = 17; //已兑付数额
+    string noticeHash = 18; //中登质押公示文件哈希
+}
+
+enum FinanceState {
+    Fi_UNK = 0;
+    Fi_INVEST = 1; //融资中
+    Fi_CANCEL = 2; //已撤销
+    Fi_FINISHED = 3; //已完成
+}
+
+message Finance {
+    string assetId = 1; //资产编号
+    int32 rate = 2; //挂牌利率
+    int64 days = 3; //到期时间
+    int64 amount = 4; //挂牌金额
+    int64 financeAmount = 5; //融资金额
+    string financeId = 6; //融资编号
+    string userUid = 7; //转让企业uid
+    FinanceState state = 8; //融资状态
+    int64 investedAmount = 9; //已投资份额
+}
+
+enum PaymentState {
+    Pa_UNK = 0;
+    Pa_FROZEN = 1; //冻结中
+    Pa_CANCELED = 2; //已撤销
+    Pa_FINISHED = 3; //已完成
+}
+
+message Payment {
+    string assetId = 1; //支付资产
+    string fromUid = 2; //支付者uid
+    string toUid = 3; //接收者uid
+    int64 amount = 4; //支付金额
+    int64 orderAmount = 5; //订单金额
+    string info = 6; //附言
+    string paymentId = 7; //支付编号
+    int32 rate = 8; //支付利率
+    PaymentState state = 9; //支付状态
+}
+
+message BatchCash {
+    string batchId = 1; //批量兑付编号
+    string assetId = 2; //资产编号
+    repeated Owner owners = 3; //要承兑的持有人权益列表
+    int64 amount = 4; //承兑总金额
+    DateType dateType = 5; //承兑类型
+}
+
+message Withdraw {
+    string withdrawId = 1;
+    string uid = 2;
+    int64 rmb = 3;
+    WithdrawState state = 4;
+    string auditor = 5;
+    string reviewer = 6;
+}
+
+message CashRecord {
+    string recordId = 1;
+    bool flag = 2;
+}
+
+message CashDeposit {
+    string uid = 1;
+    int64 rmb = 2;
+}
+
+enum MortgageState {
+    Mo_UNK = 0;
+    Mo_WAITTING = 1; //待摘取
+    Mo_CANCELED = 2; //已撤销
+    Mo_NORMAL = 3; //质押中
+    Mo_Overdue = 4; //已逾期
+    Mo_FINISHED = 5; //已完成
+}
+
+enum DateType {
+    D_UNK = 0;
+    D_ADVANCE = 1; //提前
+    D_NORMAL = 2; //到期
+    D_OVERDUE = 3; //逾期
+}
+
+message Mortgage {
+    string assetId = 1; //质押资产编号
+    string userUid = 2; //质押者uid
+    string mortgageId = 3; //质押编号
+    int64 mortgageAmount = 4; //质押金额
+    MortgageState state = 5; //质押状态
+    int64 endDate = 6; //质押到期日
+    int32 rate = 7; //质押费率
+    int64 rmb = 8; //融资金额
+    string picker = 9; //摘取质押者
+    DateType dateType = 10; //回购类型
+    int64 repayAmount = 11; //回购价格
+}
+
+//平台初始化
+message RequestInitPlatform {
+    bytes platformKey = 1; //平台管理员公钥
+}
+//创建后台角色
+message RequestCreateRole {
+    string roleid = 1; //角色编号,"admin"为预定义管理员角色，不可重复
+    string roleName = 2; //角色名字
+}
+//修改后台角色
+message RequestUpdateRole {
+    string roleid = 1; //角色编号,禁止任何修改"admin"的权限
+    string roleName = 2; //角色名字
+    repeated RightType rights = 3; //角色权限集合
+}
+//删除后台角色
+message RequestDeleteRole {
+    repeated string roleids = 1; //角色编号,不得删除"admin"角色
+}
+//创建后台人员
+message RequestCreateOfficial {
+    string uid = 1; //业务员UID
+    bytes pubkey = 2; //业务员公钥
+    string name = 4; //业务员姓名
+    string certificate = 5; //业务员身份证
+}
+//修改后台人员
+message RequestUpdateOfficial {
+    string uid = 1; //业务员UID
+    repeated string roleids = 3; //角色编号集合
+}
+//删除后台人员
+message RequestDeleteOfficial {
+    repeated string uids = 1; //业务员UID
+}
+//企业用户注册
+message RequestCreateCompany {
+    string companyName = 1; //企业名字
+    string certificate = 2; //证件号码
+    string legalPerson = 3; //法人姓名
+    string legalCertificate = 4; //法人身份证号码
+}
+//企业录入或修改资产(收款企业录入)
+message RequestCreateAsset {
+    string assetId = 1; //资产编号
+    string payer = 2; //付款企业
+    string receiver = 3; //收款企业
+    string guarantor = 4; //担保企业
+    int64 startDate = 5; //出账日期
+    int64 endDate = 6; //承兑日期
+    int64 amount = 7; //应收帐总额
+    int32 rate = 8; //借款利率
+    bool newAsset = 9; //是否为新资产
+    bool coreUser = 10; //是否为核心企业录入
+}
+//资产审核录入(收款企业录入)
+message RequestExamineAsset {
+    string assetId = 1; //资产编号
+    bool agree = 2; //是否同意
+    int64 validCredit = 3; //审定额度
+    string docHash = 4; //尽调报告哈希
+    string noticeHash = 5; //中登公示哈希
+}
+//企业撤回资产
+message RequestCancelAsset {
+    string assetId = 1; //资产编号
+}
+//设置企业用户信用总额度
+message RequestSetCredit {
+    string userUid = 1; //用户UID
+    int64 totalAmount = 2; //用户信用总额度
+}
+//审核企业用户入金
+message RequestExamineDeposit {
+    repeated CashDeposit deposits = 1; //入金记录数组
+}
+//企业申请出金
+message RequestApplyWithdraw {
+    string withdrawId = 1; //出金申请编号
+    int64 rmb = 2; //申请入金数量
+}
+//出纳审核企业用户出金
+message RequestExamineWithdraw {
+    repeated CashRecord withdraws = 1; //出金初审记录数组
+}
+//财务主管审核或复核企业用户出金
+message RequestReviewWithdraw {
+    repeated CashRecord withdraws = 1; //出金初审记录数组
+}
+//质押资产
+message RequestMortgage {
+    string mortgageId = 1; //质押编号
+    string assetId = 2; //资产编号
+    int64 mortgageAmount = 3; //质押金额
+    int32 rate = 4; //质押费率
+    int64 endDate = 5; //回购日
+}
+//撤销质押
+message RequestCancelMortgage {
+    string mortgageId = 1; //质押编号
+}
+//摘取质押
+message RequestConfirmMortgage {
+    string mortgageId = 1; //质押编号
+    int64 rmb = 2; //融资金额
+}
+//回购资产
+message RequestRedeem {
+    string mortgageId = 1; //质押编号
+    DateType dateType = 2; //回购时间
+    int64 repayAmount = 3; //回购价格
+}
+//设置质押逾期(超级管理员签名)
+message RequestOverdue {
+    repeated string morgageIds = 1; //逾期质押编号数组
+}
+//确认出金结果(超级管理员签名)
+message RequestConfirmWithdraw {
+    repeated CashRecord withdraws = 1; //确认出金记录数组(成功传true,失败传false)
+}
+//签收应收账款
+message RequestReceive {
+    string assetId = 1; //资产编号
+    bool agree = 2; //是否签收
+    int64 amount = 3; //签收金额
+}
+//挂牌转让
+message RequestSell {
+    string assetId = 1; //资产编号
+    int32 rate = 2; //挂牌利率
+    int64 days = 3; //到期天数
+    int64 amount = 4; //挂牌金额
+    int64 financeAmount = 5; //融资金额
+    string financeId = 6; //融资编号
+}
+//撤销挂牌
+message RequestCancel {
+    string financeId = 1; //融资编号
+}
+//摘牌
+message RequestInvestAsset {
+    string financeId = 1; //融资编号
+    int64 payAmount = 2; //支付金额
+    int64 assetAmount = 3; //摘取资产金额
+}
+//支付
+message RequestPay {
+    string assetId = 1; //支付资产
+    string toUid = 2; //接收者uid
+    int64 amount = 3; //支付总份额
+    int64 orderAmount = 4; //订单金额
+    string info = 5; //附言
+    string paymentId = 6; //支付编号
+    int32 rate = 7; //协议利率
+}
+//解除冻结状态
+message RequestRecover {
+    string paymentId = 1; //支付编号
+}
+//撤销支付
+message RequestCancelPay {
+    string paymentId = 1; //支付编号
+}
+//批量承兑
+message RequestBatchCash {
+    string assetId = 1; //资产编号
+    repeated Owner owners = 2; //要承兑的持有人权益列表
+    int64 amount = 3; //承兑总金额
+    string batchId = 4; //批量兑付编号
+    DateType dateType = 5; //承兑期限
+}
+
+//线下兑付
+message RequestOfflineCash {
+    string assetId = 1; //支付资产
+    string toUid = 2; //接收者uid
+    string paymentId = 3; //支付编号
+    int64  payAmount = 4;//支付金额
+}
+

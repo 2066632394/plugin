@@ -1,0 +1,182 @@
+syntax = "proto3";
+package types;
+
+message MallAction{
+    oneof value{
+        MallPlatformDeposit     mallPlatformDeposit = 1;//平台充币
+        MallUserWithdraw        mallUserWithdraw = 2;//用户提币
+        MallUserGive            mallUserGive = 3;//用户赠送
+        MallAddGood             mallAddGood = 4;//添加产品
+        MallPay                 mallPay = 5;//支付
+        MallDelivery            mallDelivery = 6;//提货
+    }
+    int32 Ty = 50;
+}
+
+//平台充币
+message MallPlatformDeposit {
+    repeated MallTxUnit deposit = 1;//
+}
+
+//用户提币
+message MallUserWithdraw {
+    string name = 1;//
+    bool isToken = 2;//
+    int64 amount = 3;//
+    string txHash = 4;//
+    int64 fee = 5;//
+}
+
+//用户赠送
+message MallUserGive {
+    bytes to = 1;//
+    string name = 2;//
+    bool isToken = 3;//
+    int64 amount = 4;//
+}
+
+//添加产品
+message MallAddGood {
+    MallGoodBaseInfo baseInfo = 1;//基本信息
+    MallGoodSpecInfo specInfo = 2;//规格信息
+    MallGoodOtherInfo otherInfo = 3;//其他信息
+}
+
+//用户支付
+message MallPay {
+    repeated MallSinglePay singlePay = 1;//
+}
+
+//用户提货
+message MallDelivery {
+    string gid = 1;//商品编号
+    string name = 2;//商品名称
+    string coin = 3;//商品币种
+    int64 num = 4;//提货数量
+    string uname = 5;//提货人名称
+    int64 phone = 6;//提货人手机号
+    string address = 7;//提货地址
+    int64 applyTime = 8;//申请时间
+    int64 deliveryTime = 9;//发货时间
+    int64 finishTime = 10;//收货时间
+    string express = 11; // 快递
+    string expressNo = 12;// 快递号
+    string note = 13;//提货地址
+}
+
+message MallSinglePay {
+    MallPayOrder payOrder = 1;//
+    MallPayInfo payInfo = 2;//
+}
+
+message MallPayOrder { //只做记录，不做计算
+   string oid = 1; // 订单编号
+   string gid = 2;// 商品编号
+   bytes sellerPubkey = 3;// 卖家公钥
+   bytes buyerPubkey = 4;// 买家公钥
+   string name = 5;// 商品名称
+   string coin = 6;// 商品币种
+   int64 amount = 7;// 商品单价
+   int64 num = 8;// 购买数量
+   int64 postFee = 9;// 订单邮费
+   int64 total = 10;// 订单总价（含邮费）
+   int64 orderTime = 11; // 下单时
+}
+
+message MallPayInfo {
+    bytes sellerPubkey = 1;// 卖家公钥
+    bytes buyerPubkey = 2;// 买家公钥
+    bool isToken = 3;// 是否是token
+    string payCoin = 4;// 支付币种
+    int64 price = 5;// 支付币种的行情
+    int64 payNum = 6;// 支付数量
+    MallAllType payType = 7; // 支付类型（现货，全款预售，付定金，付尾款）
+    string buyCoin = 8;// 购买币种
+    int64 buyNum = 9;// 购买数量 // 现货，全款预售，付尾款：买家获得buyNum数量的buyCoin币种，付定金不获得
+    int64 payTime = 10; // 支付时间
+}
+
+message MallGoodBaseInfo {
+    string goodId = 1;//商品编号
+    string goodName = 2;//商品名称
+    MallAllType goodType = 3;//商品类型 全新 二手
+    string properties = 4;//
+}
+
+
+message MallGoodSpecInfo {
+    repeated MallTokenInfo tokenInfo = 1;//规格信息，一个规格一个token
+}
+
+message MallGoodOtherInfo {
+    MallAllType payType = 1;//支付类型
+    MallAllType advanceType = 2;//预售类型
+    int64 advanceAmount = 3;//预付款
+    int64 startTime = 4;//
+    int64 endTime = 5;//
+    int64 tstartTime = 6;//
+    int64 tendTime = 7;//
+    MallAllType postType = 8;//
+    int64 firstNum = 9;//
+    int64 firstAmount = 10;//
+    int64 secondNum = 11;//
+    int64 secondAmount = 12;//
+}
+
+message MallTokenInfo {
+    string specId = 1;//规格唯一标识
+    int64 price = 2;//
+    int64 num = 3;//
+    string token = 4;//
+    string standard = 5; // 规格详细信息
+}
+
+
+enum MallAllType {
+    DEFAULT = 0;//
+    GOOD_NEW = 1;//商品类型：全新
+    GOOD_RESALE = 2;//商品类型：转卖
+    GOOD_FUTURES_FULL = 3;//预售类型：全款预售
+    GOOD_FUTURES_DEPOSIT = 4;//预售类型：定金预售
+    POST_FREE = 5;//包邮
+    POST_NOT_FREE = 6;//不包邮
+    PAY_SPOT = 7;// 支付类型：现货支付
+    PAY_FUTURES_FULL = 8;//支付类型：全款预售
+    PAY_FUTURES_DEPOSIT = 9;//支付类型：付定金
+    PAY_FUTURES_TAIL = 10;//支付类型：付尾款
+}
+
+message MallTxUnit {
+    string addr = 1;//
+    string name = 2;//
+    bool isToken = 3;//
+    int64 amount = 4;//
+}
+
+message MallUserInfo {
+    string addr = 1;//地址
+    repeated MallUserCurrency currency = 2;//币账户
+    repeated MallUserToken    token    = 3;//token账
+}
+
+message MallUserCurrency {
+    string name = 1;//
+    int64 amount = 2;//
+}
+
+message MallUserToken {
+    string name = 1;//
+    int64 amount = 2;//
+}
+
+message MallPlatformInfo {
+    int64 feeAmount = 1;//
+}
+
+enum MallState {
+    UNKNOW              = 0;
+}
+
+enum MallOperationType {
+    UNKNOW_OP               = 0;
+}
